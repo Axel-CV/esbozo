@@ -1,0 +1,16 @@
+[SddmGreeterTheme]
+Name=esbozo
+Description=Login centrado estilo Windows (hora, fecha, avatar, password, power buttons + session selector)
+Author=Axel-CV
+Copyright=(c) 2026
+License=GPLv3
+Type=sddm-theme
+Version=1.0
+Website=https://github.com/Axel-CV/esbozo
+Screenshot=
+MainScript=Main.qml
+ConfigFile=theme.conf
+TranslationsDirectory=translations
+Theme-Id=esbozo
+Theme-API=2.11
+QtVersion=6
