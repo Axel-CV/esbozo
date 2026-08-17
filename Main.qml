@@ -43,8 +43,24 @@ Item {
         }
 
         // Reloj
-                Clock {
-            anchors.centerIn: parent
+        Clock {
+            id: mainClock
+            // Centar el reloj horizontalmente
+            anchors.horizontalCenter: parent.horizontalCenter
+            // Anclar el reloj en la parte superior de la pantalla
+            anchors.top: parent.top
+            // Ajustar la posición vertical del reloj para que quede más abajo
+            anchors.topMargin: 80
+        }
+
+        LoginPrompt {
+            id: loginPrompt
+            // Centrar el texto horizontalmente
+            anchors.horizontalCenter: parent.horizontalCenter
+            // Anclar al borde inferior de la pantalla
+            anchors.bottom: parent.bottom
+            // Ajustar la posición vertical del texto para que quede más arriba
+            anchors.bottomMargin: 80
         }
     }
 
