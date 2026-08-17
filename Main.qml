@@ -102,5 +102,40 @@ Item {
                 }
             }
         }
+
+        // Botones del sistema (suspender, hibernar, reiniciar, apagar)
+        Row {
+            // Los anclamos al fondo y al centro horizontal
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 200
+            anchors.horizontalCenter: parent.horizontalCenter
+            
+            // Setear el espacio entre los botones
+            spacing: 64
+
+            SystemIconButton {
+                iconSource: "../Assets/icons/button_sleep.svg"
+                onClicked: sddm.suspend()
+            }
+
+            SystemIconButton {
+                iconSource: "../Assets/icons/button_hibernate.svg"
+                onClicked: sddm.hibernate()
+            }
+
+            SystemIconButton {
+                iconSource: "../Assets/icons/button_reboot.svg"
+                onClicked: sddm.reboot()
+            }
+
+            SystemIconButton {
+                iconSource: "../Assets/icons/button_poweroff.svg"
+                onClicked: sddm.powerOff()
+            }
+
+            SystemIconButton {
+                iconSource: "../Assets/icons/button_change_language.svg"
+            }
+        }
     }
 }
