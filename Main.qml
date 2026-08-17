@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
+import "Components"
 
 Item {
     id: root
@@ -39,6 +40,11 @@ Item {
         Keys.onPressed: (event) => {
             root.showLoginScreen = true
             event.accepted = true
+        }
+
+        // Reloj
+                Clock {
+            anchors.centerIn: parent
         }
     }
 
