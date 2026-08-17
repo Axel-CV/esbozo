@@ -77,6 +77,17 @@ Item {
         // Animación transición (fade in / fade out)
         Behavior on opacity { NumberAnimation { duration: 300 } }
 
+        // Selector de sesión
+        SessionSelector {
+            id: sessionSelector
+            anchors.top: parent.top
+            anchors.left: parent.left
+            
+            // Ajustar la posición del selector de sesión
+            anchors.topMargin: 40
+            anchors.leftMargin: 40
+        }
+
         // Componente de avatar y nombre de usuario
         Column {
             anchors.centerIn: parent
