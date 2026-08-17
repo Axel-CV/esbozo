@@ -7,95 +7,134 @@ Item {
     width: 400
     height: 48  
 
-    // Variable para almacenar el índice de la sesión seleccionada
-    property alias currentIndex: comboBox.currentIndex
+    // Índice de la sesión seleccionada
+    property int currentIndex: sessionModel ? sessionModel.lastIndex : 0
+    property var sessionNames: []
 
-    ComboBox {
-        id: comboBox
-        anchors.fill: parent
-        
-        // Conectamos el ComboBox directamente al modelo de sesiones de SDDM
+    // Repeater para actualizar la lista de nombres de sesión cuando el modelo cambie
+    Repeater {
         model: sessionModel
+        onCountChanged: updateSessionList()
+        onModelChanged: updateSessionList()
         
-        // SDDM guarda el nombre de la sesión en la propiedad "name" del modelo
-        textRole: "name" 
-        
-        // Al iniciar, selecciona la última sesión que usó el usuario
-        Component.onCompleted: currentIndex = sessionModel.lastIndex
+        delegate: Item {
+            Component.onCompleted: {
+                sessionSelector.sessionNames[index] = model.name;
+                sessionSelector.updateButtonText();
+            }
+        }
+    }
 
-        // Estilo del ComboBox
+    // Actualizar la lista de nombres de sesión y el texto del botón al cargar el componente
+    Component.onCompleted: {
+        updateSessionList();
+    }
+
+    // Función para actualizar la lista de nombres de sesión y el texto del botón
+    function updateSessionList() {
+        if (sessionModel && sessionModel.count > 0) {
+            if (currentIndex < 0 || currentIndex >= sessionModel.count) {
+                currentIndex = sessionModel.lastIndex >= 0 ? sessionModel.lastIndex : 0;
+            }
+            updateButtonText();
+        }
+    }
+
+    // Función para actualizar el texto del botón según la sesión seleccionada
+    function updateButtonText() {
+        if (sessionNames[currentIndex]) {
+            buttonText.text = sessionNames[currentIndex];
+        } else if (sessionModel && sessionModel.count > 0) {
+            buttonText.text = "Seleccionar sesión";
+        }
+    }
+
+    // Selector para abrir el popup de selección de sesión
+    Rectangle {
+        id: mainButton
+        anchors.fill: parent
+        color: "#E0E0E0"
+        radius: 16
+
+        Row {
+            anchors.fill: parent
+            anchors.leftMargin: 15
+            anchors.rightMargin: 15
+            spacing: 12
+            
+            Image {
+                source: "../Assets/icons/wayland.svg"
+                width: 32
+                height: 32
+                anchors.verticalCenter: parent.verticalCenter
+                fillMode: Image.PreserveAspectFit
+            }
+            
+            Text {
+                id: buttonText
+                text: "Cargando..."
+                color: "#333333"
+                font.pixelSize: 16
+                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width - 32 
+                elide: Text.ElideRight
+            }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: sessionPopup.open()
+        }
+    }
+
+    // Popup para mostrar la lista de sesiones disponibles
+    Popup {
+        id: sessionPopup
+        y: sessionSelector.height + 8
+        width: sessionSelector.width
+        padding: 5
+        
+        implicitHeight: Math.min((sessionModel ? sessionModel.count * 48 : 0) + 10, 240)
+
         background: Rectangle {
             color: "#E0E0E0"
             radius: 16
         }
 
-        // Diseño del botón principal del ComboBox (el que muestra la sesión seleccionada)
-        contentItem: Item {
-            anchors.fill: parent
+        contentItem: ListView {
+            id: listView
+            clip: true
+            model: sessionModel
             
-            Row {
-                anchors.fill: parent
-                anchors.leftMargin: 15
-                anchors.rightMargin: 15
-                spacing: 12
+            delegate: ItemDelegate {
+                width: sessionPopup.width - 10
+                height: 48
                 
-                Image {
-                    source: "../Assets/icons/wayland.svg"
-                    width: 32
-                    height: 32
-                    anchors.verticalCenter: parent.verticalCenter
-                    fillMode: Image.PreserveAspectFit
-                }
-                
-                Text {
-                    text: comboBox.currentText
+                contentItem: Text {
+                    text: model.name || ""
                     color: "#333333"
                     font.pixelSize: 16
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width - 32 
-                    elide: Text.ElideRight
+                    verticalAlignment: Text.AlignVCenter
+                    leftPadding: 10
                 }
-            }
-        }
+                
+                background: Rectangle {
+                    color: parent.hovered ? "#C0C0C0" : "transparent"
+                    radius: 8
+                }
 
-        // Diseño del selecionable que aparece al hacer clic en el ComboBox
-        popup: Popup {
-            y: comboBox.height + 8
-            width: comboBox.width
-            padding: 5
-
-            contentItem: ListView {
-                clip: true
-                implicitHeight: contentHeight
-                model: comboBox.popup.visible ? comboBox.delegateModel : null
-                currentIndex: comboBox.highlightedIndex
-            }
-
-            background: Rectangle {
-                color: "#E0E0E0"
-                radius: 16
-            }
-        }
-
-        // Diseño de cada elemento del ComboBox (cada sesión disponible)
-        delegate: ItemDelegate {
-            width: comboBox.width - 10
-            height: 48
-            
-            contentItem: Text {
-                // Lee el nombre de la sesión desde el modelo de SDDM
-                text: model.name 
-                color: "#333333"
-                font.pixelSize: 16
-                verticalAlignment: Text.AlignVCenter
-
-                leftPadding: 10
-            }
-            
-            background: Rectangle {
-                // Si pasas el ratón por encima, se oscurece para que sepas qué vas a elegir
-                color: parent.hovered ? "#C0C0C0" : "#E0E0E0"
-                radius: 8
+                onClicked: {
+                    currentIndex = index;
+                    buttonText.text = model.name;
+                    
+                    // Notificar a SDDM el cambio de sesión
+                    if (typeof sddm !== "undefined" && sddm && ("sessionIndex" in sddm)) {
+                        sddm.sessionIndex = index;
+                    }
+                    
+                    sessionPopup.close();
+                }
             }
         }
     }
