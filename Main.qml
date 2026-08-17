@@ -77,11 +77,30 @@ Item {
         // Animación transición (fade in / fade out)
         Behavior on opacity { NumberAnimation { duration: 300 } }
 
-        // Componente de campo de contraseña
-        PasswordField {
-            id: loginComponent
+        // Componente de avatar y nombre de usuario
+        Column {
             anchors.centerIn: parent
+            spacing: 30 // Espacio generoso entre el avatar y el input de contraseña
 
+            UserAvatar {
+                id: userProfile
+                anchors.horizontalCenter: parent.horizontalCenter
+                
+                // Estos valores luego los conectaremos con la API de SDDM
+                username: "axelcv" 
+                // avatarPath: "../assets/avatars/default.png" 
+            }
+
+            PasswordField {
+                id: passwordField
+                anchors.horizontalCenter: parent.horizontalCenter
+                
+                // Escuchamos el "grito" (señal) que configuramos antes
+                onLoginRequested: (password) => {
+                    console.log("Intentando loguear a axelcv con la contraseña ingresada...")
+                    // Aquí irá el código real de login de SDDM: sddm.login("axelcv", password, sessionIndex)
+                }
+            }
         }
     }
 }
