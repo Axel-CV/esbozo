@@ -11,7 +11,33 @@ Item {
     property int currentIndex: sessionModel ? sessionModel.lastIndex : 0
     property var sessionNames: []
 
-    // Repeater para actualizar la lista de nombres de sesión cuando el modelo cambie
+    // Función para obtener el icono de la sesión según su nombre
+    function getSessionIcon(sessionName) {
+        if (!sessionName)
+            return "../Assets/icons/wayland.svg"
+
+        var name = sessionName.toLowerCase()
+
+        console.log("Buscando icono para la sesión: " + name)
+
+        var icons = {
+            "kde":        "../Assets/icons/kde-plasma.svg",
+            "plasma":     "../Assets/icons/kde-plasma.svg",
+            "hyprland":   "../Assets/icons/hyprland.svg",
+            "wayland":    "../Assets/icons/wayland.svg",
+        }
+
+        for (var key in icons) {
+            if (name.includes(key))
+            console.log("Icono encontrado para la sesión '" + sessionName + "': " + icons[key])
+                return icons[key]
+        }
+
+        // Fallback
+        return "../Assets/icons/kde-plasma.svg"
+    }
+
+    // Repeater para actualizar la lista de nombres de sesión
     Repeater {
         model: sessionModel
         onCountChanged: updateSessionList()
@@ -19,33 +45,33 @@ Item {
         
         delegate: Item {
             Component.onCompleted: {
-                sessionSelector.sessionNames[index] = model.name;
-                sessionSelector.updateButtonText();
+                sessionSelector.sessionNames[index] = model.name
+                sessionSelector.updateButtonText()
             }
         }
     }
 
     // Actualizar la lista de nombres de sesión y el texto del botón al cargar el componente
     Component.onCompleted: {
-        updateSessionList();
+        updateSessionList()
     }
 
     // Función para actualizar la lista de nombres de sesión y el texto del botón
     function updateSessionList() {
         if (sessionModel && sessionModel.count > 0) {
             if (currentIndex < 0 || currentIndex >= sessionModel.count) {
-                currentIndex = sessionModel.lastIndex >= 0 ? sessionModel.lastIndex : 0;
+                currentIndex = sessionModel.lastIndex >= 0 ? sessionModel.lastIndex : 0
             }
-            updateButtonText();
+            updateButtonText()
         }
     }
 
     // Función para actualizar el texto del botón según la sesión seleccionada
     function updateButtonText() {
         if (sessionNames[currentIndex]) {
-            buttonText.text = sessionNames[currentIndex];
+            buttonText.text = sessionNames[currentIndex]
         } else if (sessionModel && sessionModel.count > 0) {
-            buttonText.text = "Seleccionar sesión";
+            buttonText.text = "Seleccionar sesión"
         }
     }
 
@@ -63,7 +89,7 @@ Item {
             spacing: 12
             
             Image {
-                source: "../Assets/icons/wayland.svg"
+                source: getSessionIcon(buttonText.text)
                 width: 32
                 height: 32
                 anchors.verticalCenter: parent.verticalCenter
@@ -111,12 +137,25 @@ Item {
                 width: sessionPopup.width - 10
                 height: 48
                 
-                contentItem: Text {
-                    text: model.name || ""
-                    color: "#333333"
-                    font.pixelSize: 16
-                    verticalAlignment: Text.AlignVCenter
+                contentItem: Row {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 12
                     leftPadding: 10
+
+                    Image {
+                        source: getSessionIcon(model.name)
+                        width: 28
+                        height: 28
+                        anchors.verticalCenter: parent.verticalCenter
+                        fillMode: Image.PreserveAspectFit
+                    }
+
+                    Text {
+                        text: model.name || ""
+                        color: "#333333"
+                        font.pixelSize: 16
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
                 }
                 
                 background: Rectangle {
@@ -125,15 +164,15 @@ Item {
                 }
 
                 onClicked: {
-                    currentIndex = index;
-                    buttonText.text = model.name;
+                    currentIndex = index
+                    buttonText.text = model.name
                     
                     // Notificar a SDDM el cambio de sesión
                     if (typeof sddm !== "undefined" && sddm && ("sessionIndex" in sddm)) {
-                        sddm.sessionIndex = index;
+                        sddm.sessionIndex = index
                     }
                     
-                    sessionPopup.close();
+                    sessionPopup.close()
                 }
             }
         }
