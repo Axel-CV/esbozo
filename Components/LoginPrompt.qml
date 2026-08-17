@@ -21,7 +21,7 @@ Item {
         // EL ÍCONO
         Image {
             id: promptIcon
-            source: "../Assets/icons/login_door_icon.svg"
+            source: "../Assets/icons/login_door.svg"
             width: 32
             height: 32
             fillMode: Image.PreserveAspectFit

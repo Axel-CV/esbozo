@@ -53,6 +53,7 @@ Item {
             anchors.topMargin: 80
         }
 
+        // Mensaje para cambiar a la vista de login
         LoginPrompt {
             id: loginPrompt
             // Centrar el texto horizontalmente
@@ -75,5 +76,12 @@ Item {
 
         // Animación transición (fade in / fade out)
         Behavior on opacity { NumberAnimation { duration: 300 } }
+
+        // Componente de campo de contraseña
+        PasswordField {
+            id: loginComponent
+            anchors.centerIn: parent
+
+        }
     }
 }
