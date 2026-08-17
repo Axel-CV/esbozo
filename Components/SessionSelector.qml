@@ -18,8 +18,6 @@ Item {
 
         var name = sessionName.toLowerCase()
 
-        console.log("Buscando icono para la sesión: " + name)
-
         var icons = {
             "kde":        "../Assets/icons/kde-plasma.svg",
             "plasma":     "../Assets/icons/kde-plasma.svg",
@@ -29,7 +27,6 @@ Item {
 
         for (var key in icons) {
             if (name.includes(key))
-            console.log("Icono encontrado para la sesión '" + sessionName + "': " + icons[key])
                 return icons[key]
         }
 
