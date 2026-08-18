@@ -91,25 +91,18 @@ Item {
         // Componente de avatar y nombre de usuario
         Column {
             anchors.centerIn: parent
-            spacing: 30 // Espacio generoso entre el avatar y el input de contraseña
+            spacing: 30
 
             UserAvatar {
-                id: userProfile
+                id: userSwitcher
                 anchors.horizontalCenter: parent.horizontalCenter
-                
-                // Estos valores luego los conectaremos con la API de SDDM
-                username: "axelcv" 
-                // avatarPath: "../assets/avatars/default.png" 
             }
 
             PasswordField {
                 id: passwordField
                 anchors.horizontalCenter: parent.horizontalCenter
-                
-                // Escuchamos el "grito" (señal) que configuramos antes
                 onLoginRequested: (password) => {
-                    console.log("Intentando loguear a axelcv con la contraseña ingresada...")
-                    // Aquí irá el código real de login de SDDM: sddm.login("axelcv", password, sessionIndex)
+                    sddm.login(userSwitcher.selectedUser, password, sessionSelector.sessionIndex)
                 }
             }
         }
