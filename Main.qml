@@ -138,7 +138,16 @@ Item {
             }
 
             SystemIconButton {
+                id: languageButton
                 iconSource: "../Assets/icons/button_change_language.svg"
+                onClicked: keyboardPopup.visible ? keyboardPopup.close() : keyboardPopup.open()
+            }
+
+            KeyboardSelector {
+                id: keyboardPopup
+                parent: languageButton
+                x: (languageButton.width - width) / 2
+                y: -height - 12
             }
         }
     }
