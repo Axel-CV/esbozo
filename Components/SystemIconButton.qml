@@ -6,6 +6,7 @@ Item {
     // Variables para el ícono y su tamaño
     property string iconSource: ""
     property int iconSize: 72
+    property bool active: false
 
     // El tamaño del área clickeable será igual al tamaño del ícono
     width: iconSize
@@ -13,6 +14,20 @@ Item {
 
     // Señal para notificar cuando se hace clic en el botón
     signal clicked()
+
+    Rectangle {
+        anchors.centerIn: parent
+        width: parent.width * 1.5
+        height: parent.height
+        color: "#E0E0E0"
+        radius: 8
+        opacity: iconButton.active ? 0.45 : 0.0
+        scale: iconButton.active ? 1.0 : 0.92
+        visible: opacity > 0
+
+        Behavior on opacity { NumberAnimation { duration: 180 } }
+        Behavior on scale { NumberAnimation { duration: 180 } }
+    }
 
     Image {
         id: buttonIcon

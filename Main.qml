@@ -140,6 +140,7 @@ Item {
             SystemIconButton {
                 id: languageButton
                 iconSource: "../Assets/icons/button_change_language.svg"
+                active: keyboardPopup.visible
                 onClicked: keyboardPopup.visible ? keyboardPopup.close() : keyboardPopup.open()
             }
 

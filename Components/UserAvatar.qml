@@ -4,7 +4,7 @@ import Qt5Compat.GraphicalEffects
 Item {
     id: avatarComponent
 
-    // Iniciamos con lastUser. Si por algún motivo está vacío, el Repeater lo corregirá.
+    // Iniciamos con lastUser
     property string selectedUser: userModel.lastUser || ""
     property string selectedIcon: ""
     property bool expanded: false
@@ -12,26 +12,26 @@ Item {
     width: row.implicitWidth
     height: 160 + usernameText.implicitHeight + 8
 
-    // CONTROLADOR OCULTO: Resuelve el problema del "usuario fantasma" y asigna íconos
+    // Repeater que se encarga de sincronizar el ícono del usuario seleccionado con el modelo de usuarios
     Repeater {
         model: userModel
         delegate: Item {
             visible: false
             
             Component.onCompleted: {
-                // 1. Si no hay un último usuario guardado, forzamos a que el PRIMER usuario real (index 0) sea el principal
+                // Si no hay un usuario seleccionado, seleccionamos el primero del modelo
                 if (avatarComponent.selectedUser === "" && index === 0) {
                     avatarComponent.selectedUser = name
                     avatarComponent.selectedIcon = icon
                 }
                 
-                // 2. Si este delegado coincide con el usuario seleccionado, extraemos su ícono
+                // Si el usuario del delegado es el mismo que el seleccionado, sincronizamos el ícono
                 if (name === avatarComponent.selectedUser) {
                     avatarComponent.selectedIcon = icon
                 }
             }
 
-            // 3. Mantiene el ícono sincronizado automáticamente si cambias de usuario
+            // Mantenemos sincronizado el ícono del usuario seleccionado con el modelo de usuarios
             Connections {
                 target: avatarComponent
                 function onSelectedUserChanged() {
@@ -48,13 +48,18 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: 24
 
-        // Avatar principal (usuario seleccionado)
+        // Usuario seleccionado
         Item {
             id: mainAvatarItem
             width: 160; height: 160
             anchors.verticalCenter: parent.verticalCenter
 
-            Rectangle { id: mainMask; anchors.fill: parent; radius: width / 2; color: "#D9D9D9" }
+            Rectangle { 
+                id: mainMask
+                anchors.fill: parent
+                radius: width / 2
+                color: "#D9D9D9" 
+            }
             Image {
                 id: mainImg
                 anchors.fill: parent
@@ -62,7 +67,11 @@ Item {
                 fillMode: Image.PreserveAspectCrop
                 visible: false
             }
-            OpacityMask { anchors.fill: parent; source: mainImg; maskSource: mainMask }
+            OpacityMask { 
+                anchors.fill: parent
+                source: mainImg
+                maskSource: mainMask 
+            }
 
             MouseArea {
                 anchors.fill: parent
@@ -117,6 +126,7 @@ Item {
         }
     }
 
+    // Nombre del usuario seleccionado
     Text {
         id: usernameText
         anchors.top: row.bottom
