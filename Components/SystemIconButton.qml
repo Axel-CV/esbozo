@@ -5,7 +5,7 @@ Item {
     
     // Variables para el ícono y su tamaño
     property string iconSource: ""
-    property int iconSize: 72
+    property int iconSize: 54
     property bool active: false
 
     // El tamaño del área clickeable será igual al tamaño del ícono
