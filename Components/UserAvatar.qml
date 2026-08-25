@@ -109,7 +109,35 @@ Item {
                 x: getCenterX() - (width / 2)
                 y: (carouselContainer.height - height) / 2
 
-                // TODO: Agregar animación para la selección de usuario y el cambio de posición en el carrusel
+                // Animación para la selección de usuario y el cambio de posición en el carrusel
+                Behavior on x {
+                    enabled: Config.enableAnimations
+                    NumberAnimation {
+                        duration: 240
+                        easing.type: Easing.OutQuad
+                    }
+                }
+                Behavior on width {
+                    enabled: Config.enableAnimations
+                    NumberAnimation {
+                        duration: 240
+                        easing.type: Easing.OutQuad
+                    }
+                }
+                Behavior on height {
+                    enabled: Config.enableAnimations
+                    NumberAnimation {
+                        duration: 240
+                        easing.type: Easing.OutQuad
+                    }
+                }
+                Behavior on opacity {
+                    enabled: Config.enableAnimations
+                    NumberAnimation {
+                        duration: 240
+                        easing.type: Easing.OutQuad
+                    }
+                }
 
                 Rectangle { 
                     id: mainMask
