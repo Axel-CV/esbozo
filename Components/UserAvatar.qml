@@ -63,11 +63,6 @@ Item {
             width: ListView.isCurrentItem ? 160 : 120
             height: ListView.isCurrentItem ? 160 : 120
 
-            // Solo mostrar el seleccionado cuando está cerrado
-            opacity: avatarComponent.expanded || ListView.isCurrentItem ? 1.0 : 0.0
-            visible: opacity > 0
-            scale: ListView.isCurrentItem ? 1.0 : 0.85
-
             Behavior on width { 
                 NumberAnimation { 
                     duration: 220
@@ -80,69 +75,96 @@ Item {
                     easing.type: Easing.OutQuad 
                 } 
             }
-            Behavior on x { 
-                NumberAnimation { 
-                    duration: 220
-                    easing.type: Easing.OutQuad 
-                } 
-            }
-            Behavior on opacity { 
-                NumberAnimation { 
-                    duration: 180 
-                    easing.type: Easing.OutQuad 
-                } 
-            }
-            Behavior on scale { 
-                NumberAnimation { 
-                    duration: 220; 
-                    easing.type: Easing.OutQuad 
-                } 
-            }
 
-            // Avatar circular
-            Rectangle {
-                id: mask
-                anchors.fill: parent
-                radius: width / 2
-                visible: false
-            }
+            // Ocultar los items detras del seleccionado
+            Item {
+                id: visualWrapper
+                width: parent.width
+                height: parent.height
 
-            Image {
-                id: avatarImage
-                anchors.fill: parent
-                source: model.icon || "../Assets/avatars/default_avatar.jpeg"
-                fillMode: Image.PreserveAspectCrop
-                visible: false
-                asynchronous: true
-            }
+                // Calculamos matemáticamente la distancia hacia el centro del avatar actual
+                property real targetOffsetX: {
+                    let list = delegateavatarComponent.ListView.view
+                    if (list && list.currentItem) {
+                        let centerOfCurrent = list.currentItem.x + (list.currentItem.width / 2)
+                        let myCenter = delegateavatarComponent.x + (delegateavatarComponent.width / 2)
+                        return centerOfCurrent - myCenter
+                    }
+                    return 0
+                }
 
-            OpacityMask {
-                anchors.fill: parent
-                source: avatarImage
-                maskSource: mask
-            }
+                // Mover el item hacia el centro
+                x: (!avatarComponent.expanded && !delegateavatarComponent.ListView.isCurrentItem) ? targetOffsetX : 0
 
-            // Borde sutil cuando está seleccionado
-            Rectangle {
-                anchors.fill: parent
-                radius: width / 2
-                color: "transparent"
-                border.color: ListView.isCurrentItem ? "#FFFFFF" : "transparent"
-                border.width: 3
-                opacity: 0.7
-            }
+                // Solo mostrar el seleccionado cuando está cerrado
+                opacity: avatarComponent.expanded || delegateavatarComponent.ListView.isCurrentItem ? 1.0 : 0.0
+                visible: opacity > 0
+                scale: ListView.isCurrentItem ? 1.0 : 0.85
 
-            MouseArea {
-                anchors.fill: parent
-                // Desactiva el cursor de mano si solo hay 1 usuario en el sistema
-                cursorShape: userModel.count > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
-                onClicked: {
-                    if (ListView.isCurrentItem) {
-                        if (userModel.count > 1)
-                            avatarComponent.expanded = !avatarComponent.expanded
-                    } else {
-                        carouselContainer.currentIndex = index
-                        avatarComponent.expanded = true
+                Behavior on x { 
+                    NumberAnimation { 
+                        duration: 220
+                        easing.type: Easing.OutQuad 
+                    } 
+                }
+                Behavior on opacity { 
+                    NumberAnimation { 
+                        duration: 180 
+                        easing.type: Easing.OutQuad 
+                    } 
+                }
+                Behavior on scale { 
+                    NumberAnimation { 
+                        duration: 220; 
+                        easing.type: Easing.OutQuad 
+                    } 
+                }
+
+                // Avatar circular
+                Rectangle {
+                    id: mask
+                    anchors.fill: parent
+                    radius: width / 2
+                    visible: false
+                }
+
+                Image {
+                    id: avatarImage
+                    anchors.fill: parent
+                    source: model.icon || "../Assets/avatars/default_avatar.jpeg"
+                    fillMode: Image.PreserveAspectCrop
+                    visible: false
+                    asynchronous: true
+                }
+
+                OpacityMask {
+                    anchors.fill: parent
+                    source: avatarImage
+                    maskSource: mask
+                }
+
+                // Borde sutil cuando está seleccionado
+                Rectangle {
+                    anchors.fill: parent
+                    radius: width / 2
+                    color: "transparent"
+                    border.color: delegateavatarComponent.ListView.isCurrentItem ? "#FFFFFF" : "transparent"
+                    border.width: 3
+                    opacity: 0.7
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    // Desactiva el cursor de mano si solo hay 1 usuario en el sistema
+                    cursorShape: userModel.count > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    onClicked: {
+                        if (delegateavatarComponent.ListView.isCurrentItem) {
+                            if (userModel.count > 1)
+                                avatarComponent.expanded = !avatarComponent.expanded
+                        } else {
+                            carouselContainer.currentIndex = index
+                            avatarComponent.expanded = true
+                        }
                     }
                 }
             }
