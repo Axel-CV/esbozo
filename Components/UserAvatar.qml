@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 
 Item {
@@ -7,170 +8,141 @@ Item {
     // Iniciamos con lastUser
     property string selectedUser: userModel.lastUser || ""
     property string selectedIcon: ""
+    property int selectedIndex: 0
+    // Cargar el usuario seleccionado
+    function syncFromIndex(idx) {
+        if (idx < 0 || idx >= userModel.count) return
+
+        var name = userModel.data(userModel.index(idx, 0), 257) || ""
+        var icon = userModel.data(userModel.index(idx, 0), 260) || ""
+
+        avatarComponent.selectedIndex = idx
+        avatarComponent.selectedUser = name
+        avatarComponent.selectedIcon = icon
+        avatarComponent.userChanged(name, icon)
+    }
+
     property bool expanded: false
 
-    property int selectedIndex: 0
-    
-    // Posición base para el cálculo de los índices en el carrusel
-    property int baseIndex: 0
-
-    // Cuando el menú se abre, actualizamos el baseIndex para reiniciar la fila
-    onExpandedChanged: {
-        if (expanded) {
-            baseIndex = selectedIndex;
-        }
-    }
+    // Signal para notificar cambios de usuario
+    signal userChanged(string username, string icon)
 
     width: parent.width
     height: 160 + usernameText.implicitHeight + 8
 
-    Item {
+    // Vista de los avatares de usuario en forma de lista horizontal (carrusel)
+    ListView {
         id: carouselContainer
         width: parent.width
         height: 160
         anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
 
-        Repeater {
-            model: userModel
+        orientation: ListView.Horizontal
+        spacing: 24
+        interactive: false
+        clip: false
+        model: userModel
+        currentIndex: avatarComponent.selectedIndex
 
-            delegate: Item {
-                id: delegateItem
-                
-                // Variable para saber que usuario está seleccionado
-                readonly property bool isSelected: name === avatarComponent.selectedUser
-                
-                // Rotar las posiciones de los usuarios en el carrusel para que el seleccionado siempre esté en el centro
-                readonly property int circularIndex: {
-                    if (userModel.count === 0) return 0;
-                    return (index - avatarComponent.baseIndex + userModel.count) % userModel.count;
-                }
-                
-                // Calcular el índice del usuario actualmente seleccionado en el carrusel
-                readonly property int targetCircularIndex: {
-                    if (userModel.count === 0) return 0;
-                    return (avatarComponent.selectedIndex - avatarComponent.baseIndex + userModel.count) % userModel.count;
-                }
+        // Centrar el item activo
+        preferredHighlightBegin: (width - 160) / 2
+        preferredHighlightEnd: preferredHighlightBegin
+        highlightRangeMode: ListView.StrictlyEnforceRange
+        highlightMoveDuration: 220
+        highlightMoveVelocity: -1
 
-                // Calcular el desplazamiento del usuario actual respecto al seleccionado
-                readonly property int offsetIndex: circularIndex - targetCircularIndex
+        // Márgenes para que el item central quede bien centrado
+        leftMargin: preferredHighlightBegin
+        rightMargin: preferredHighlightBegin
 
-                // Tamaño y opacidad del avatar según si está seleccionado o no
-                width: isSelected ? 160 : 120
-                height: isSelected ? 160 : 120
-                opacity: isSelected ? 1.0 : (avatarComponent.expanded ? 0.16 : 0.0)
-                z: isSelected ? 10 : 0 
+        onCurrentIndexChanged: avatarComponent.syncFromIndex(currentIndex)
 
-                Component.onCompleted: {
-                    if (avatarComponent.selectedUser === "" && index === 0) {
-                        avatarComponent.selectedUser = name;
-                        avatarComponent.selectedIcon = icon;
-                        avatarComponent.selectedIndex = index;
-                        avatarComponent.baseIndex = index;
-                    } else if (name === avatarComponent.selectedUser) {
-                        avatarComponent.selectedIndex = index;
-                        avatarComponent.selectedIcon = icon;
-                        avatarComponent.baseIndex = index;
-                    }
-                }
+        delegate: Item {
+            id: delegateavatarComponent
+            width: ListView.isCurrentItem ? 160 : 120
+            height: ListView.isCurrentItem ? 160 : 120
 
-                Connections {
-                    target: avatarComponent
-                    function onSelectedUserChanged() {
-                        if (name === avatarComponent.selectedUser) {
-                            avatarComponent.selectedIndex = index;
-                            avatarComponent.selectedIcon = icon;
-                        }
-                    }
-                }
+            // Solo mostrar el seleccionado cuando está cerrado
+            opacity: avatarComponent.expanded || ListView.isCurrentItem ? 1.0 : 0.0
+            visible: opacity > 0
+            scale: ListView.isCurrentItem ? 1.0 : 0.85
 
-                // Calcular la posición X del avatar en el carrusel
-                function getCenterX() {
-                    let centerOfScreen = carouselContainer.width / 2;
+            Behavior on width { 
+                NumberAnimation { 
+                    duration: 220
+                    easing.type: Easing.OutQuad 
+                } 
+            }
+            Behavior on height { 
+                NumberAnimation { 
+                    duration: 220
+                    easing.type: Easing.OutQuad 
+                } 
+            }
+            Behavior on x { 
+                NumberAnimation { 
+                    duration: 220
+                    easing.type: Easing.OutQuad 
+                } 
+            }
+            Behavior on opacity { 
+                NumberAnimation { 
+                    duration: 180 
+                    easing.type: Easing.OutQuad 
+                } 
+            }
+            Behavior on scale { 
+                NumberAnimation { 
+                    duration: 220; 
+                    easing.type: Easing.OutQuad 
+                } 
+            }
 
-                    // Si está cerrado, todos se ocultan en el centro (detrás del seleccionado)
-                    if (!avatarComponent.expanded && !isSelected) {
-                        return centerOfScreen;
-                    }
+            // Avatar circular
+            Rectangle {
+                id: mask
+                anchors.fill: parent
+                radius: width / 2
+                visible: false
+            }
 
-                    // El usuario seleccionado va al centro
-                    if (offsetIndex === 0) return centerOfScreen;
+            Image {
+                id: avatarImage
+                anchors.fill: parent
+                source: model.icon || "../Assets/avatars/default_avatar.jpeg"
+                fillMode: Image.PreserveAspectCrop
+                visible: false
+                asynchronous: true
+            }
 
-                    // Los demás usuarios se colocan a la izquierda o derecha del seleccionado
-                    if (offsetIndex > 0) {
-                        // Usuarios a la derecha
-                        return centerOfScreen + 164 + (offsetIndex - 1) * 144;
+            OpacityMask {
+                anchors.fill: parent
+                source: avatarImage
+                maskSource: mask
+            }
+
+            // Borde sutil cuando está seleccionado
+            Rectangle {
+                anchors.fill: parent
+                radius: width / 2
+                color: "transparent"
+                border.color: ListView.isCurrentItem ? "#FFFFFF" : "transparent"
+                border.width: 3
+                opacity: 0.7
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                // Desactiva el cursor de mano si solo hay 1 usuario en el sistema
+                cursorShape: userModel.count > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
+                onClicked: {
+                    if (ListView.isCurrentItem) {
+                        if (userModel.count > 1)
+                            avatarComponent.expanded = !avatarComponent.expanded
                     } else {
-                        // Usuarios a la izquierda
-                        return centerOfScreen - 164 + (offsetIndex + 1) * 144;
-                    }
-                }
-
-                // Colocar el avatar en la posición calculada
-                x: getCenterX() - (width / 2)
-                y: (carouselContainer.height - height) / 2
-
-                // Animación para la selección de usuario y el cambio de posición en el carrusel
-                Behavior on x {
-                    enabled: Config.enableAnimations
-                    NumberAnimation {
-                        duration: 240
-                        easing.type: Easing.OutQuad
-                    }
-                }
-                Behavior on width {
-                    enabled: Config.enableAnimations
-                    NumberAnimation {
-                        duration: 240
-                        easing.type: Easing.OutQuad
-                    }
-                }
-                Behavior on height {
-                    enabled: Config.enableAnimations
-                    NumberAnimation {
-                        duration: 240
-                        easing.type: Easing.OutQuad
-                    }
-                }
-                Behavior on opacity {
-                    enabled: Config.enableAnimations
-                    NumberAnimation {
-                        duration: 240
-                        easing.type: Easing.OutQuad
-                    }
-                }
-
-                Rectangle { 
-                    id: mainMask
-                    anchors.fill: parent
-                    radius: width / 2
-                    color: "#D9D9D9" 
-                }
-                Image {
-                    id: mainImg
-                    anchors.fill: parent
-                    source: avatarComponent.selectedIcon || "../Assets/avatars/default_avatar.jpeg"
-                    fillMode: Image.PreserveAspectCrop
-                    visible: false
-                }
-                OpacityMask { 
-                    anchors.fill: parent
-                    source: mainImg
-                    maskSource: mainMask 
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    // Desactiva el cursor de mano si solo hay 1 usuario en el sistema
-                    cursorShape: userModel.count > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    onClicked: {
-                        if (isSelected) {
-                            if (userModel.count > 1) {
-                                avatarComponent.expanded = !avatarComponent.expanded;
-                            }
-                        } else {
-                            avatarComponent.selectedUser = name;
-                            avatarComponent.selectedIcon = icon;
-                        }
+                        carouselContainer.currentIndex = index
+                        avatarComponent.expanded = true
                     }
                 }
             }
@@ -181,11 +153,54 @@ Item {
     Text {
         id: usernameText
         anchors.top: carouselContainer.bottom
-        anchors.topMargin: 8
+        anchors.topMargin: 12
         anchors.horizontalCenter: parent.horizontalCenter
         text: avatarComponent.selectedUser
         color: "white"
         font.pixelSize: 24
-        font.weight: Font.Regular
+        font.weight: Font.Medium
+    }
+
+    // Manejo de teclas para navegación y selección
+    //focus: true
+    Keys.onPressed: function(event) {
+        // Desactivar la navegación si hay menos o solo un usuario
+        if (userModel.count <= 1) return
+
+        if (event.key === Qt.Key_Left) {
+            carouselContainer.decrementCurrentIndex()
+            avatarComponent.expanded = true
+            event.accepted = true
+        }
+        else if (event.key === Qt.Key_Right) {
+            carouselContainer.incrementCurrentIndex()
+            avatarComponent.expanded = true
+            event.accepted = true
+        }
+        else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+            avatarComponent.expanded = !avatarComponent.expanded
+            event.accepted = true
+        }
+        else if (event.key === Qt.Key_Escape) {
+            avatarComponent.expanded = false
+            event.accepted = true
+        }
+    }
+
+    // Inicialización
+    Component.onCompleted: {
+        if (userModel.count > 0) {
+            var index = userModel.lastIndex
+
+            if (typeof index !== "number" ||
+                index < 0 ||
+                index >= userModel.count) {
+                index = 0
+            }
+
+            carouselContainer.currentIndex = index
+            avatarComponent.syncFromIndex(index) 
+        }
+        forceActiveFocus()
     }
 }
