@@ -23,7 +23,9 @@ Item {
     Item {
         id: initialScreen
         anchors.fill: parent
-        focus: !root.showLoginScreen
+
+        // Poner el foco en la pantalla inicial al iniciar la aplicación
+        Component.onCompleted: forceActiveFocus()
 
         // Esconder la pantalla inicial cuando se muestre la pantalla de login
         opacity: root.showLoginScreen ? 0 : 1
@@ -70,7 +72,6 @@ Item {
     Item {
         id: loginScreen
         anchors.fill: parent
-        focus: !root.showLoginScreen
         
         // Esconder la pantalla de login cuando se muestre la pantalla inicial
         opacity: root.showLoginScreen ? 1 : 0
@@ -221,8 +222,9 @@ Item {
 
     onShowLoginScreenChanged: {
         if (showLoginScreen) {
-            loginScreen.forceActiveFocus()
             passwordField.forceActiveFocus()
+        } else {
+            initialScreen.forceActiveFocus()
         }
     }
 }
