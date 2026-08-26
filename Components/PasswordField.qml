@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 
-Item {
+FocusScope {
     id: passwordComponent
     
     // Adaptar el tamaño del contenedor al tamaño de sus hijos (caja de texto y botón)
@@ -21,6 +21,10 @@ Item {
             height: passwordComponent.height
             color: "#E0E0E0"
             radius: 16
+
+            // Indicador visual de enfoque
+            border.width: passwordInput.activeFocus ? 2 : 0
+            border.color: "#3d7eff"
 
             Row {
                 anchors.fill: parent
