@@ -23,6 +23,7 @@ Item {
     Item {
         id: initialScreen
         anchors.fill: parent
+        focus: !root.showLoginScreen
 
         // Esconder la pantalla inicial cuando se muestre la pantalla de login
         opacity: root.showLoginScreen ? 0 : 1
@@ -69,6 +70,7 @@ Item {
     Item {
         id: loginScreen
         anchors.fill: parent
+        focus: !root.showLoginScreen
         
         // Esconder la pantalla de login cuando se muestre la pantalla inicial
         opacity: root.showLoginScreen ? 1 : 0
@@ -86,6 +88,10 @@ Item {
             // Ajustar la posición del selector de sesión
             anchors.topMargin: 40
             anchors.leftMargin: 40
+
+            KeyNavigation.tab: userSwitcher
+            KeyNavigation.backtab: languageButton
+            KeyNavigation.down: userSwitcher
         }
 
         // Componente de avatar y nombre de usuario
@@ -96,11 +102,24 @@ Item {
             UserAvatar {
                 id: userSwitcher
                 anchors.horizontalCenter: parent.horizontalCenter
+
+                KeyNavigation.tab: passwordField
+                KeyNavigation.backtab: sessionSelector
+                KeyNavigation.up: sessionSelector
+                KeyNavigation.down: passwordField
             }
 
             PasswordField {
                 id: passwordField
                 anchors.horizontalCenter: parent.horizontalCenter
+
+                focus: true
+
+                KeyNavigation.tab: sleepButton
+                KeyNavigation.backtab: userSwitcher
+                KeyNavigation.up: userSwitcher
+                KeyNavigation.down: sleepButton
+
                 onLoginRequested: (password) => {
                     sddm.login(userSwitcher.selectedUser, password, sessionSelector.sessionIndex)
                 }
@@ -118,23 +137,51 @@ Item {
             spacing: 64
 
             SystemIconButton {
+                id: sleepButton
                 iconSource: "../Assets/icons/button_sleep.svg"
                 onClicked: sddm.suspend()
+
+                KeyNavigation.tab: hibernateButton
+                KeyNavigation.backtab: passwordField
+                KeyNavigation.up: passwordField
+                KeyNavigation.left: languageButton
+                KeyNavigation.right: hibernateButton
             }
 
             SystemIconButton {
+                id: hibernateButton
                 iconSource: "../Assets/icons/button_hibernate.svg"
                 onClicked: sddm.hibernate()
+
+                KeyNavigation.tab: rebootButton
+                KeyNavigation.backtab: sleepButton
+                KeyNavigation.up: sleepButton
+                KeyNavigation.left: sleepButton
+                KeyNavigation.right: rebootButton
             }
 
             SystemIconButton {
+                id: rebootButton
                 iconSource: "../Assets/icons/button_reboot.svg"
                 onClicked: sddm.reboot()
+
+                KeyNavigation.tab: poweroffButton
+                KeyNavigation.backtab: hibernateButton
+                KeyNavigation.up: passwordField
+                KeyNavigation.left: hibernateButton
+                KeyNavigation.right: poweroffButton
             }
 
             SystemIconButton {
+                id: poweroffButton
                 iconSource: "../Assets/icons/button_poweroff.svg"
                 onClicked: sddm.powerOff()
+
+                KeyNavigation.tab: languageButton
+                KeyNavigation.backtab: rebootButton
+                KeyNavigation.up: passwordField
+                KeyNavigation.left: rebootButton
+                KeyNavigation.right: languageButton
             }
 
             SystemIconButton {
@@ -142,6 +189,12 @@ Item {
                 iconSource: "../Assets/icons/button_change_language.svg"
                 active: keyboardPopup.visible
                 onClicked: keyboardPopup.visible ? keyboardPopup.close() : keyboardPopup.open()
+
+                KeyNavigation.tab: sessionSelector
+                KeyNavigation.backtab: poweroffButton
+                KeyNavigation.up: passwordField
+                KeyNavigation.left: poweroffButton
+                KeyNavigation.right: sleepButton
             }
 
             KeyboardSelector {
@@ -150,6 +203,26 @@ Item {
                 x: (languageButton.width - width) / 2
                 y: -height - 12
             }
+        }
+        // Comportamiento de la tecla Escape
+        Keys.onPressed: function(event) {
+            if (event.key === Qt.Key_Escape) {
+                // Si hay un popup abierto, cerrarlo
+                if (keyboardPopup.visible) {
+                    keyboardPopup.close()
+                } else {
+                    // Si no hay popup abierto, volver a la pantalla inicial
+                    root.showLoginScreen = false
+                }
+                event.accepted = true
+            }
+        }
+    }
+
+    onShowLoginScreenChanged: {
+        if (showLoginScreen) {
+            loginScreen.forceActiveFocus()
+            passwordField.forceActiveFocus()
         }
     }
 }
