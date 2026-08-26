@@ -21,8 +21,8 @@ Item {
         height: parent.height
         color: "#E0E0E0"
         radius: 8
-        opacity: iconButton.active ? 0.45 : 0.0
-        scale: iconButton.active ? 1.0 : 0.92
+        opacity: (iconButton.active || iconButton.activeFocus) ? 0.45 : 0.0
+        scale: (iconButton.active || iconButton.activeFocus) ? 1.0 : 0.92
         visible: opacity > 0
 
         Behavior on opacity { NumberAnimation { duration: 180 } }
@@ -39,7 +39,7 @@ Item {
         // Si está presionado: 50% transparente.
         // Si el mouse está encima: 100% opaco.
         // Estado normal: 70% opaco (así no distraen tanto hasta que los vas a usar).
-        opacity: mouseArea.pressed ? 0.5 : (mouseArea.containsMouse ? 1.0 : 0.7)
+        opacity: mouseArea.pressed ? 0.5 : (mouseArea.containsMouse || iconButton.activeFocus ? 1.0 : 0.7)
         
         // Animación suave para los cambios de opacidad
         Behavior on opacity { NumberAnimation { duration: 150 } }
@@ -52,6 +52,13 @@ Item {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton
-        onClicked: iconButton.clicked()
+        onClicked: {
+            iconButton.forceActiveFocus()
+            iconButton.clicked()
+        }
     }
+
+    Keys.onReturnPressed: iconButton.clicked()
+    Keys.onEnterPressed: iconButton.clicked()
+    Keys.onSpacePressed: iconButton.clicked()
 }
