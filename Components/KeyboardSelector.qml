@@ -6,6 +6,14 @@ Popup {
     width: 240
     padding: 6
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+    
+    property int highlightedIndex: keyboard.currentLayout
+
+    onOpened: {
+        highlightedIndex = keyboard.currentLayout
+        listView.positionViewAtIndex(highlightedIndex, ListView.Contain)
+        listView.forceActiveFocus()
+    }
 
     // Animación al abrir y cerrar
     enter: Transition { 
@@ -34,10 +42,13 @@ Popup {
 
     // Lista de teclados
     contentItem: ListView {
+        id: listView
         implicitHeight: Math.min(contentHeight, 260)
         clip: true
         spacing: 4
         model: keyboard.layouts
+
+        focus: true
 
         delegate: Rectangle {
             width: parent.width
@@ -45,13 +56,14 @@ Popup {
             radius: 8
 
             // Cambiar el color de fondo si el elemento está seleccionado o si el mouse está sobre él
-            property bool isSelected: index === keyboard.currentLayout
+            property bool isApplied: index === keyboard.currentLayout
+            property bool isHighlighted: index === idiomSelector.highlightedIndex
             property bool isHovered: mouseArea.containsMouse
 
             Behavior on color { ColorAnimation { duration: 150 } }
             color: {
-                if (isSelected && isHovered) return "#4Dffffff" // 30% blanco (Seleccionado + Hover)
-                if (isSelected) return "#33ffffff"              // 20% blanco (Solo seleccionado)
+                if (isHighlighted && isHovered) return "#4Dffffff" // 30% blanco (Seleccionado + Hover)
+                if (isHighlighted) return "#33ffffff"              // 20% blanco (Solo seleccionado)
                 if (isHovered) return "#1Affffff"               // 10% blanco (Solo hover)
                 return "transparent"                              // Estado normal
             }
@@ -63,13 +75,13 @@ Popup {
                 anchors.verticalCenter: parent.verticalCenter
                 Text { 
                     text: longName
-                    color: isSelected ? "#ffffff" : "#dddddd" 
+                    color: isHighlighted ? "#ffffff" : "#dddddd" 
                     font.pixelSize: 15 
-                    font.weight: isSelected ? Font.DemiBold : Font.Normal
+                    font.weight: isHighlighted ? Font.DemiBold : Font.Normal
                 }
                 Text { 
-                    text: qsTr("Teclado ") + longName
-                    color: isSelected ? "#bbbbbb" : "#888888" 
+                    text: qsTr("Teclado ") + longName + (isApplied ? qsTr(" - Activo") : "")
+                    color: isHighlighted ? "#bbbbbb" : "#888888" 
                     font.pixelSize: 11 
                 }
             }
@@ -79,10 +91,28 @@ Popup {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
+                onEntered: idiomSelector.highlightedIndex = index
                 onClicked: {
                     keyboard.currentLayout = index
                     idiomSelector.close()
                 }
+            }
+        }
+        Keys.onPressed: function(event) {
+            var count = keyboard.layouts.count !== undefined ? keyboard.layouts.count : listView.count
+
+            if (event.key === Qt.Key_Down) {
+                highlightedIndex = Math.min(highlightedIndex + 1, count - 1)
+                listView.positionViewAtIndex(highlightedIndex, ListView.Contain)
+                event.accepted = true
+            } else if (event.key === Qt.Key_Up) {
+                highlightedIndex = Math.max(highlightedIndex - 1, 0)
+                listView.positionViewAtIndex(highlightedIndex, ListView.Contain)
+                event.accepted = true
+            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                keyboard.currentLayout = highlightedIndex
+                idiomSelector.close()
+                event.accepted = true
             }
         }
     }
