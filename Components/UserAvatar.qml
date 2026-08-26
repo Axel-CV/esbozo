@@ -60,46 +60,25 @@ Item {
 
         delegate: Item {
             id: delegateavatarComponent
-            width: ListView.isCurrentItem ? 160 : 120
-            height: ListView.isCurrentItem ? 160 : 120
+            width: 160
+            height: 160
 
-            Behavior on width { 
-                NumberAnimation { 
-                    duration: 220
-                    easing.type: Easing.OutQuad 
-                } 
-            }
-            Behavior on height { 
-                NumberAnimation { 
-                    duration: 220
-                    easing.type: Easing.OutQuad 
-                } 
-            }
+            property bool isSelected: ListView.isCurrentItem
 
             // Ocultar los items detras del seleccionado
             Item {
                 id: visualWrapper
                 width: parent.width
                 height: parent.height
+                anchors.centerIn: parent
 
-                // Calculamos matemáticamente la distancia hacia el centro del avatar actual
-                property real targetOffsetX: {
-                    let list = delegateavatarComponent.ListView.view
-                    if (list && list.currentItem) {
-                        let centerOfCurrent = list.currentItem.x + (list.currentItem.width / 2)
-                        let myCenter = delegateavatarComponent.x + (delegateavatarComponent.width / 2)
-                        return centerOfCurrent - myCenter
-                    }
-                    return 0
-                }
+                scale: delegateavatarComponent.isSelected ? 1.0 : 0.75
 
-                // Mover el item hacia el centro
-                x: (!avatarComponent.expanded && !delegateavatarComponent.ListView.isCurrentItem) ? targetOffsetX : 0
+                opacity: avatarComponent.expanded ||
+                        delegateavatarComponent.isSelected
+                        ? 1.0 : 0.0
 
-                // Solo mostrar el seleccionado cuando está cerrado
-                opacity: avatarComponent.expanded || delegateavatarComponent.ListView.isCurrentItem ? 1.0 : 0.0
                 visible: opacity > 0
-                scale: ListView.isCurrentItem ? 1.0 : 0.85
 
                 Behavior on x { 
                     NumberAnimation { 
