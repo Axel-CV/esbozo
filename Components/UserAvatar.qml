@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 
-Item {
+FocusScope {
     id: avatarComponent
 
     // Iniciamos con lastUser
@@ -182,7 +182,7 @@ Item {
     }
 
     // Manejo de teclas para navegación y selección
-    //focus: true
+    focus: true
     Keys.onPressed: function(event) {
         // Desactivar la navegación si hay menos o solo un usuario
         if (userModel.count <= 1) return
