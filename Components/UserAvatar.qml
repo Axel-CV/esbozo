@@ -146,7 +146,7 @@ Item {
                     anchors.fill: parent
                     radius: width / 2
                     color: "transparent"
-                    border.color: delegateavatarComponent.ListView.isCurrentItem ? "#FFFFFF" : "transparent"
+                    border.color: "transparent"
                     border.width: 3
                     opacity: 0.7
                 }
