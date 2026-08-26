@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 
-Item {
+FocusScope {
     id: sessionSelector
     
     width: 400
@@ -72,12 +72,26 @@ Item {
         }
     }
 
+    function selectSession(index) {
+        if (index < 0 || index >= sessionModel.count) return
+        currentIndex = index
+        buttonText.text = sessionNames[index]
+        if (typeof sddm !== "undefined" && sddm && ("sessionIndex" in sddm)) {
+            sddm.sessionIndex = index
+        }
+        sessionPopup.close()
+    }
+
     // Selector para abrir el popup de selección de sesión
     Rectangle {
         id: mainButton
         anchors.fill: parent
         color: "#E0E0E0"
         radius: 16
+
+        // Indicador visual de enfoque
+        border.width: sessionSelector.activeFocus ? 2 : 0
+        border.color: "#3d7eff"
 
         Row {
             anchors.fill: parent
@@ -107,7 +121,10 @@ Item {
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
-            onClicked: sessionPopup.open()
+            onClicked: {
+                sessionSelector.forceActiveFocus()
+                sessionPopup.open()
+            }
         }
     }
 
@@ -156,22 +173,34 @@ Item {
                 }
                 
                 background: Rectangle {
-                    color: parent.hovered ? "#C0C0C0" : "transparent"
+                    color: parent.hovered || parent.highlighted ? "#C0C0C0" : "transparent"
                     radius: 8
                 }
 
-                onClicked: {
-                    currentIndex = index
-                    buttonText.text = model.name
-                    
-                    // Notificar a SDDM el cambio de sesión
-                    if (typeof sddm !== "undefined" && sddm && ("sessionIndex" in sddm)) {
-                        sddm.sessionIndex = index
-                    }
-                    
-                    sessionPopup.close()
-                }
+                onClicked: sessionSelector.selectSession(index)
             }
+        }
+    }
+    // Manejo de teclas para navegación y selección
+    Keys.onPressed: function(event) {
+        if (sessionPopup.visible) {
+            if (event.key === Qt.Key_Down) {
+                listView.currentIndex = Math.min(listView.currentIndex + 1, sessionModel.count - 1)
+                event.accepted = true
+            } else if (event.key === Qt.Key_Up) {
+                listView.currentIndex = Math.max(listView.currentIndex - 1, 0)
+                event.accepted = true
+            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                selectSession(listView.currentIndex)
+                event.accepted = true
+            } else if (event.key === Qt.Key_Escape) {
+                sessionPopup.close()
+                event.accepted = true
+            }
+        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+            listView.currentIndex = currentIndex
+            sessionPopup.open()
+            event.accepted = true
         }
     }
 }
