@@ -137,6 +137,7 @@ Item {
             // Setear el espacio entre los botones
             spacing: 64
 
+            // Botón de suspensión
             SystemIconButton {
                 id: sleepButton
                 iconSource: "../Assets/icons/button_sleep.svg"
@@ -149,6 +150,7 @@ Item {
                 KeyNavigation.right: hibernateButton
             }
 
+            // Botón de hibernación
             SystemIconButton {
                 id: hibernateButton
                 iconSource: "../Assets/icons/button_hibernate.svg"
@@ -161,6 +163,7 @@ Item {
                 KeyNavigation.right: rebootButton
             }
 
+            // Botón de reinicio
             SystemIconButton {
                 id: rebootButton
                 iconSource: "../Assets/icons/button_reboot.svg"
@@ -173,6 +176,7 @@ Item {
                 KeyNavigation.right: poweroffButton
             }
 
+            // Botón de apagado
             SystemIconButton {
                 id: poweroffButton
                 iconSource: "../Assets/icons/button_poweroff.svg"
@@ -185,26 +189,65 @@ Item {
                 KeyNavigation.right: languageButton
             }
 
-            SystemIconButton {
-                id: languageButton
-                iconSource: "../Assets/icons/button_change_language.svg"
-                active: keyboardPopup.visible
-                onClicked: keyboardPopup.visible ? keyboardPopup.close() : keyboardPopup.open()
+            // Selector de idioma
+            Row {
+                id: languageGroup
+                spacing: 8
+                anchors.verticalCenter: parent.verticalCenter 
 
-                KeyNavigation.tab: sessionSelector
-                KeyNavigation.backtab: poweroffButton
-                KeyNavigation.up: passwordField
-                KeyNavigation.left: poweroffButton
-                KeyNavigation.right: sleepButton
+                Text {
+                id: languageLabel
+                color: "white"
+                font.pixelSize: 16
+                font.weight: Font.Medium
+                anchors.verticalCenter: parent.verticalCenter
+
+                text: getLayoutText()
+
+                function getLayoutText() {
+                    if (!keyboard || !keyboard.layouts || keyboard.currentLayout < 0)
+                        return "—"
+
+                    var layout = keyboard.layouts[keyboard.currentLayout]
+                    return KeyboardMap.getShortCode(layout)
+                }
+
+                Connections {
+                    target: keyboard
+                    function onCurrentLayoutChanged() {
+                        languageLabel.text = languageLabel.getLayoutText()
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: languageButton.clicked()
+                }
             }
 
-            KeyboardSelector {
-                id: keyboardPopup
-                parent: languageButton
-                x: (languageButton.width - width) / 2
-                y: -height - 12
+                SystemIconButton {
+                    id: languageButton
+                    iconSource: "../Assets/icons/button_change_language.svg"
+                    active: keyboardPopup.visible
+                    onClicked: keyboardPopup.visible ? keyboardPopup.close() : keyboardPopup.open()
+
+                    KeyNavigation.tab: sessionSelector
+                    KeyNavigation.backtab: poweroffButton
+                    KeyNavigation.up: passwordField
+                    KeyNavigation.left: poweroffButton
+                    KeyNavigation.right: sleepButton
+                }
+
+                KeyboardSelector {
+                    id: keyboardPopup
+                    parent: languageButton
+                    x: (languageButton.width - width) / 2
+                    y: -height - 12
+                }
             }
         }
+
         // Comportamiento de la tecla Escape
         Keys.onPressed: function(event) {
             if (event.key === Qt.Key_Escape) {
