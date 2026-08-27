@@ -21,7 +21,6 @@ Item {
 
     // Columna para apilar la hora arriba y la fecha abajo
     Column {
-        anchors.centerIn: parent
         spacing: 8
 
         // TEXTO DE LA HORA
@@ -31,7 +30,7 @@ Item {
             text: Qt.formatTime(clockContainer.currentDate, "hh:mm")
             color: "white"
             font.pixelSize: 80
-            font.weight: Font.Regular
+            font.weight: Font.Normal
             horizontalAlignment: Text.AlignHCenter
             anchors.horizontalCenter: parent.horizontalCenter
         }
@@ -43,7 +42,7 @@ Item {
             text: Qt.formatDateTime(clockContainer.currentDate, "dddd, d 'de' MMMM, yyyy")
             color: "#E0E0E0"
             font.pixelSize: 24
-            font.weight: Font.Regular
+            font.weight: Font.Normal
             horizontalAlignment: Text.AlignHCenter
             anchors.horizontalCenter: parent.horizontalCenter
         }

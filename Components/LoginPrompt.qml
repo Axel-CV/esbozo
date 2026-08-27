@@ -15,7 +15,6 @@ Item {
     }
 
     Column {
-        anchors.centerIn: parent
         spacing: 8
 
         // EL ÍCONO
@@ -33,7 +32,7 @@ Item {
             text: "Presiona cualquier tecla"
             color: "white"
             font.pixelSize: 16
-            font.weight: Font.Regular
+            font.weight: Font.Normal
             anchors.horizontalCenter: parent.horizontalCenter
         }
     }
