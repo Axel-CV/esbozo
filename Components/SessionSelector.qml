@@ -5,7 +5,7 @@ FocusScope {
     id: sessionSelector
     
     width: 400
-    height: 48  
+    height: 48
 
     // Índice de la sesión seleccionada
     property int currentIndex: sessionModel ? sessionModel.lastIndex : 0
@@ -13,11 +13,10 @@ FocusScope {
 
     // Función para obtener el icono de la sesión según su nombre
     function getSessionIcon(sessionName) {
-        if (!sessionName)
-            return "../Assets/icons/wayland.svg"
+        if (!sessionName) return "../Assets/icons/wayland.svg"
 
         var name = sessionName.toLowerCase()
-
+        
         var icons = {
             "kde":        "../Assets/icons/kde-plasma.svg",
             "plasma":     "../Assets/icons/kde-plasma.svg",
@@ -26,11 +25,9 @@ FocusScope {
         }
 
         for (var key in icons) {
-            if (name.includes(key))
-                return icons[key]
+            if (name.includes(key)) return icons[key]
         }
 
-        // Fallback
         return "../Assets/icons/kde-plasma.svg"
     }
 
@@ -48,10 +45,8 @@ FocusScope {
         }
     }
 
-    // Actualizar la lista de nombres de sesión y el texto del botón al cargar el componente
-    Component.onCompleted: {
-        updateSessionList()
-    }
+     // Actualizar la lista de nombres de sesión y el texto del botón al cargar el componente
+    Component.onCompleted: updateSessionList()
 
     // Función para actualizar la lista de nombres de sesión y el texto del botón
     function updateSessionList() {
@@ -86,23 +81,25 @@ FocusScope {
     Rectangle {
         id: mainButton
         anchors.fill: parent
-        color: "#E0E0E0"
-        radius: 16
+        color: sessionSelector.activeFocus ? "#33ffffff" : "#1Affffff"
+        radius: 8
 
-        // Indicador visual de enfoque
-        border.width: sessionSelector.activeFocus ? 2 : 0
-        border.color: "#3d7eff"
+        // Inficador visual de enfoque 
+        border.width: sessionSelector.activeFocus ? 1 : 0
+        border.color: "#33ffffff"
+        
+        Behavior on color { ColorAnimation { duration: 150 } }
 
         Row {
             anchors.fill: parent
-            anchors.leftMargin: 15
-            anchors.rightMargin: 15
-            spacing: 12
+            anchors.leftMargin: 16
+            anchors.rightMargin: 16
+            spacing: 16
             
             Image {
                 source: getSessionIcon(buttonText.text)
-                width: 32
-                height: 32
+                width: 24
+                height: 24
                 anchors.verticalCenter: parent.verticalCenter
                 fillMode: Image.PreserveAspectFit
             }
@@ -110,10 +107,10 @@ FocusScope {
             Text {
                 id: buttonText
                 text: "Cargando..."
-                color: "#333333"
+                color: "#ffffff"
                 font.pixelSize: 16
                 anchors.verticalCenter: parent.verticalCenter
-                width: parent.width - 32 
+                width: parent.width - 32
                 elide: Text.ElideRight
             }
         }
@@ -123,8 +120,16 @@ FocusScope {
             cursorShape: Qt.PointingHandCursor
             onClicked: {
                 sessionSelector.forceActiveFocus()
-                sessionPopup.open()
+                sessionPopup.visible ? sessionPopup.close() : sessionPopup.open()
             }
+        }
+    }
+
+    // Si el FocusScope tiene el foco y se presiona Enter, abre el popup
+    Keys.onPressed: function(event) {
+        if (!sessionPopup.visible && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space)) {
+            sessionPopup.open()
+            event.accepted = true
         }
     }
 
@@ -133,74 +138,109 @@ FocusScope {
         id: sessionPopup
         y: sessionSelector.height + 8
         width: sessionSelector.width
-        padding: 5
+        padding: 8
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
         
-        implicitHeight: Math.min((sessionModel ? sessionModel.count * 48 : 0) + 10, 240)
+        property int highlightedIndex: sessionSelector.currentIndex
+
+        onOpened: {
+            highlightedIndex = sessionSelector.currentIndex
+            listView.positionViewAtIndex(highlightedIndex, ListView.Contain)
+            listView.forceActiveFocus()
+        }
+
+        enter: Transition { NumberAnimation { property: "opacity"; from: 0.0; to: 1.0; duration: 150 } }
+        exit: Transition { NumberAnimation { property: "opacity"; from: 1.0; to: 0.0; duration: 100 } }
 
         background: Rectangle {
-            color: "#E0E0E0"
+            color: "#D91E1E1E"
             radius: 16
+            border.color: "#33ffffff"
+            border.width: 1
         }
 
         contentItem: ListView {
             id: listView
+            implicitHeight: Math.min(contentHeight, 260)
             clip: true
+            spacing: 4
             model: sessionModel
-            
-            delegate: ItemDelegate {
-                width: sessionPopup.width - 10
-                height: 48
-                
-                contentItem: Row {
-                    anchors.verticalCenter: parent.verticalCenter
+            focus: true
+
+            delegate: Rectangle {
+                width: parent.width
+                height: 52
+                radius: 8
+
+                // Lógica de estados idéntica al teclado
+                property bool isApplied: index === sessionSelector.currentIndex
+                property bool isHighlighted: index === sessionPopup.highlightedIndex
+                property bool isHovered: mouseArea.containsMouse
+
+                Behavior on color { ColorAnimation { duration: 150 } }
+                color: {
+                    if (isHighlighted && isHovered) return "#4Dffffff" 
+                    if (isHighlighted) return "#33ffffff"              
+                    if (isHovered) return "#1Affffff"               
+                    return "transparent"                              
+                }
+
+                Row {
+                    anchors.fill: parent
+                    anchors.leftMargin: 12
+                    anchors.rightMargin: 12
                     spacing: 12
-                    leftPadding: 10
 
                     Image {
                         source: getSessionIcon(model.name)
-                        width: 28
-                        height: 28
+                        width: 24
+                        height: 24
                         anchors.verticalCenter: parent.verticalCenter
                         fillMode: Image.PreserveAspectFit
                     }
 
-                    Text {
-                        text: model.name || ""
-                        color: "#333333"
-                        font.pixelSize: 16
+                    Column {
                         anchors.verticalCenter: parent.verticalCenter
+                        Text { 
+                            text: model.name || ""
+                            color: isHighlighted ? "#ffffff" : "#dddddd" 
+                            font.pixelSize: 15 
+                            font.weight: isHighlighted ? Font.DemiBold : Font.Normal
+                        }
+                        Text { 
+                            text: isApplied ? qsTr("Sesión activa") : qsTr("Entorno de escritorio")
+                            color: isHighlighted ? "#bbbbbb" : "#888888" 
+                            font.pixelSize: 11 
+                        }
                     }
                 }
-                
-                background: Rectangle {
-                    color: parent.hovered || parent.highlighted ? "#C0C0C0" : "transparent"
-                    radius: 8
-                }
 
-                onClicked: sessionSelector.selectSession(index)
+                MouseArea {
+                    id: mouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onEntered: sessionPopup.highlightedIndex = index
+                    onClicked: sessionSelector.selectSession(index)
+                }
             }
-        }
-    }
-    // Manejo de teclas para navegación y selección
-    Keys.onPressed: function(event) {
-        if (sessionPopup.visible) {
-            if (event.key === Qt.Key_Down) {
-                listView.currentIndex = Math.min(listView.currentIndex + 1, sessionModel.count - 1)
-                event.accepted = true
-            } else if (event.key === Qt.Key_Up) {
-                listView.currentIndex = Math.max(listView.currentIndex - 1, 0)
-                event.accepted = true
-            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                selectSession(listView.currentIndex)
-                event.accepted = true
-            } else if (event.key === Qt.Key_Escape) {
-                sessionPopup.close()
-                event.accepted = true
+
+            // Manejo de teclas para navegación y selección
+            Keys.onPressed: function(event) {
+                var itemsCount = listView.count
+                if (event.key === Qt.Key_Down) {
+                    sessionPopup.highlightedIndex = Math.min(sessionPopup.highlightedIndex + 1, itemsCount - 1)
+                    listView.positionViewAtIndex(sessionPopup.highlightedIndex, ListView.Contain)
+                    event.accepted = true
+                } else if (event.key === Qt.Key_Up) {
+                    sessionPopup.highlightedIndex = Math.max(sessionPopup.highlightedIndex - 1, 0)
+                    listView.positionViewAtIndex(sessionPopup.highlightedIndex, ListView.Contain)
+                    event.accepted = true
+                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                    sessionSelector.selectSession(sessionPopup.highlightedIndex)
+                    event.accepted = true
+                }
             }
-        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
-            listView.currentIndex = currentIndex
-            sessionPopup.open()
-            event.accepted = true
         }
     }
 }
