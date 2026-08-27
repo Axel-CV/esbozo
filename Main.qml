@@ -190,53 +190,32 @@ Item {
             }
 
             // Selector de idioma
-            Row {
-                id: languageGroup
-                spacing: 8
-                anchors.verticalCenter: parent.verticalCenter 
+            LanguageButton {
+                id: languageButton
 
-                Text {
-                id: languageLabel
-                color: "white"
-                font.pixelSize: 16
-                font.weight: Font.Medium
-                anchors.verticalCenter: parent.verticalCenter
-
-                text: getLayoutText()
+                label: getLayoutText()
+                active: keyboardPopup.visible
 
                 function getLayoutText() {
                     if (!keyboard || !keyboard.layouts || keyboard.currentLayout < 0)
                         return "—"
-
-                    var layout = keyboard.layouts[keyboard.currentLayout]
-                    return KeyboardMap.getShortCode(layout)
+                    return KeyboardMap.getShortCode(keyboard.layouts[keyboard.currentLayout])
                 }
 
+                onClicked: keyboardPopup.visible ? keyboardPopup.close() : keyboardPopup.open()
+
+                KeyNavigation.tab: sessionSelector
+                KeyNavigation.backtab: poweroffButton
+                KeyNavigation.up: passwordField
+                KeyNavigation.left: poweroffButton
+                KeyNavigation.right: sleepButton
+
+                // Actualizar el label cuando cambie el layout
                 Connections {
                     target: keyboard
                     function onCurrentLayoutChanged() {
-                        languageLabel.text = languageLabel.getLayoutText()
+                        languageButton.label = languageButton.getLayoutText()
                     }
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: languageButton.clicked()
-                }
-            }
-
-                SystemIconButton {
-                    id: languageButton
-                    iconSource: "../Assets/icons/button_change_language.svg"
-                    active: keyboardPopup.visible
-                    onClicked: keyboardPopup.visible ? keyboardPopup.close() : keyboardPopup.open()
-
-                    KeyNavigation.tab: sessionSelector
-                    KeyNavigation.backtab: poweroffButton
-                    KeyNavigation.up: passwordField
-                    KeyNavigation.left: poweroffButton
-                    KeyNavigation.right: sleepButton
                 }
 
                 KeyboardSelector {

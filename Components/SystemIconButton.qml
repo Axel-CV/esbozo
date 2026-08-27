@@ -16,14 +16,14 @@ Item {
     signal clicked()
 
     Rectangle {
+        id: hoverBackground
         anchors.centerIn: parent
-        width: parent.width * 1.5
-        height: parent.height
+        width: parent.width + 16
+        height: parent.height + 16
         color: "#E0E0E0"
-        radius: 8
-        opacity: (iconButton.active || iconButton.activeFocus) ? 0.45 : 0.0
-        scale: (iconButton.active || iconButton.activeFocus) ? 1.0 : 0.92
-        visible: opacity > 0
+        radius: width / 2
+        opacity: (mouseArea.containsMouse || iconButton.active || iconButton.activeFocus) ? 0.35 : 0.0
+        scale: (mouseArea.containsMouse || iconButton.active || iconButton.activeFocus) ? 1.0 : 0.85
 
         Behavior on opacity { NumberAnimation { duration: 180 } }
         Behavior on scale { NumberAnimation { duration: 180 } }
@@ -51,7 +51,7 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton
+        
         onClicked: {
             iconButton.forceActiveFocus()
             iconButton.clicked()
