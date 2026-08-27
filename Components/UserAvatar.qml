@@ -202,8 +202,18 @@ FocusScope {
             event.accepted = true
         }
         else if (event.key === Qt.Key_Escape) {
-            avatarComponent.expanded = false
-            event.accepted = true
+            if (avatarComponent.expanded) {
+                avatarComponent.expanded = false
+                event.accepted = true
+            } else {
+                // Si ya está cerrado, dejamos que Escape suba (por si el padre quiere hacer algo)
+                event.accepted = false
+            }
+        } else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab || event.key === Qt.Key_Up || event.key === Qt.Key_Down) {
+            if (avatarComponent.expanded) {
+                avatarComponent.expanded = false
+                event.accepted = true
+            }
         }
     }
 
