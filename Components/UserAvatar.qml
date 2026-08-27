@@ -24,6 +24,13 @@ FocusScope {
 
     property bool expanded: false
 
+    // Cerrar el carrusel si se pierde el foco
+    onActiveFocusChanged: {
+        if (!activeFocus && expanded) {
+            expanded = false
+        }
+    }
+
     // Signal para notificar cambios de usuario
     signal userChanged(string username, string icon)
 
@@ -156,6 +163,9 @@ FocusScope {
                     // Desactiva el cursor de mano si solo hay 1 usuario en el sistema
                     cursorShape: userModel.count > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
                     onClicked: {
+                        // Forzar el foco en el componente de avatar
+                        avatarComponent.forceActiveFocus()
+
                         if (delegateavatarComponent.ListView.isCurrentItem) {
                             if (userModel.count > 1)
                                 avatarComponent.expanded = !avatarComponent.expanded
@@ -212,7 +222,7 @@ FocusScope {
         } else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab || event.key === Qt.Key_Up || event.key === Qt.Key_Down) {
             if (avatarComponent.expanded) {
                 avatarComponent.expanded = false
-                event.accepted = true
+                event.accepted = false
             }
         }
     }
