@@ -158,7 +158,7 @@ Item {
 
                 KeyNavigation.tab: rebootButton
                 KeyNavigation.backtab: sleepButton
-                KeyNavigation.up: sleepButton
+                KeyNavigation.up: passwordField
                 KeyNavigation.left: sleepButton
                 KeyNavigation.right: rebootButton
             }
