@@ -1,0 +1,2 @@
+singleton KeyboardMap 1.0 KeyboardMap.qml
+singleton SessionIcons 1.0 SessionIcons.qml

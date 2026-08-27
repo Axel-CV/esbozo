@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Effects
 import "Components"
+import "Maps"
 
 Item {
     id: root

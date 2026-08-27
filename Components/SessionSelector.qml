@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import "../Maps"
 
 FocusScope {
     id: sessionSelector
@@ -10,26 +11,6 @@ FocusScope {
     // Índice de la sesión seleccionada
     property int currentIndex: sessionModel ? sessionModel.lastIndex : 0
     property var sessionNames: []
-
-    // Función para obtener el icono de la sesión según su nombre
-    function getSessionIcon(sessionName) {
-        if (!sessionName) return "../Assets/icons/wayland.svg"
-
-        var name = sessionName.toLowerCase()
-        
-        var icons = {
-            "kde":        "../Assets/icons/kde-plasma.svg",
-            "plasma":     "../Assets/icons/kde-plasma.svg",
-            "hyprland":   "../Assets/icons/hyprland.svg",
-            "wayland":    "../Assets/icons/wayland.svg",
-        }
-
-        for (var key in icons) {
-            if (name.includes(key)) return icons[key]
-        }
-
-        return "../Assets/icons/kde-plasma.svg"
-    }
 
     // Repeater para actualizar la lista de nombres de sesión
     Repeater {
@@ -97,7 +78,7 @@ FocusScope {
             spacing: 16
             
             Image {
-                source: getSessionIcon(buttonText.text)
+                source: SessionIcons.getSessionIcon(buttonText.text)
                 width: 24
                 height: 24
                 anchors.verticalCenter: parent.verticalCenter
@@ -192,7 +173,7 @@ FocusScope {
                     spacing: 12
 
                     Image {
-                        source: getSessionIcon(model.name)
+                        source: SessionIcons.getSessionIcon(model.name)
                         width: 24
                         height: 24
                         anchors.verticalCenter: parent.verticalCenter

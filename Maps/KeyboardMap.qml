@@ -4,7 +4,8 @@ import QtQuick
 QtObject {
     id: root
 
-    // Diccionario: clave = parte del longName en minúsculas → valor = código corto
+    // clave = parte del longName en minúsculas
+    // valor = código corto
     readonly property var map: {
         "latin american": "ES-LATAM",
         "latam":          "ES-LATAM",
