@@ -126,6 +126,45 @@ Item {
                     sddm.login(userSwitcher.selectedUser, password, sessionSelector.sessionIndex)
                 }
             }
+
+            StatusToast {
+                id: statusToast
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.topMargin: 24
+                z: 20
+            }
+        }
+
+        // Conexiones con SDDM para mostrar mensajes de error o información
+        Connections {
+            target: sddm
+
+            function onLoginFailed() {
+                statusToast.show("Contraseña incorrecta o usuario no válido", true)
+                passwordField.clearPassword()
+                passwordField.forceActiveFocus()
+            }
+
+            function onLoginSucceeded() {
+                statusToast.show("Iniciando sesión...", false)
+            }
+
+            function onInformationMessage(message) {
+                if (message && message.length > 0)
+                    statusToast.show(message, false)
+            }
+        }
+
+        // Conexiones con el teclado para mostrar un mensaje
+        Connections {
+            target: keyboard
+
+            // Mostrar un mensaje cuando se active el bloqueo de mayúsculas
+            function onCapsLockChanged() {
+                if (keyboard.capsLock && root.showLoginScreen) {
+                    statusToast.show("Bloqueo de mayúsculas activado", false)
+                }
+            }
         }
 
         // Botones del sistema (suspender, hibernar, reiniciar, apagar)
