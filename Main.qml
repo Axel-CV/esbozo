@@ -163,6 +163,9 @@ Item {
             function onCapsLockChanged() {
                 if (keyboard.capsLock && root.showLoginScreen) {
                     statusToast.show("Bloqueo de mayúsculas activado", false)
+                } else if (!keyboard.capsLock && root.showLoginScreen) {
+                    // Desactivar el mensaje cuando se desactive el bloqueo de mayúsculas
+                    statusToast.clear()
                 }
             }
         }

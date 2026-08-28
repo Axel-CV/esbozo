@@ -8,7 +8,8 @@ Item {
 
     width: Math.min(parent ? parent.width * 0.8 : 400, messageText.implicitWidth + 40)
     height: messageText.implicitHeight + 16
-    opacity: messageText.text.length > 0 ? 1 : 0
+
+    opacity: 0
     visible: opacity > 0
 
     Behavior on opacity { NumberAnimation { duration: 180 } }
@@ -16,12 +17,19 @@ Item {
     function show(msg, error) {
         messageText.text = msg || ""
         statusToast.isError = !!error
+        statusToast.opacity = 1
         hideTimer.restart()
     }
 
     function clear() {
-        messageText.text = ""
+        statusToast.opacity = 0
         hideTimer.stop()
+    }
+
+    onOpacityChanged: {
+        if (opacity === 0) {
+            messageText.text = ""
+        }
     }
 
     Rectangle {
