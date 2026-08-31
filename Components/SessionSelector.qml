@@ -62,11 +62,11 @@ FocusScope {
     Rectangle {
         id: mainButton
         anchors.fill: parent
-        color: sessionSelector.activeFocus ? config.SurfaceOverlayStrong : config.SurfaceOverlay
+        color: (sessionSelector.activeFocus || sessionPopup.visible || mainButtonMouseArea.containsMouse) ? config.SurfaceOverlayStrong : config.SurfaceOverlay
         radius: config.RadiusSmall
 
         // Inficador visual de enfoque 
-        border.width: sessionSelector.activeFocus ? 1 : 0
+        border.width: sessionSelector.activeFocus || mainButtonMouseArea.containsMouse ? 1 : 0
         border.color: config.PopupBorder
         
         Behavior on color { ColorAnimation { duration: 150 } }
@@ -98,7 +98,9 @@ FocusScope {
         }
 
         MouseArea {
+            id: mainButtonMouseArea
             anchors.fill: parent
+            hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onClicked: {
                 sessionSelector.forceActiveFocus()
@@ -157,14 +159,14 @@ FocusScope {
                 // Lógica de estados idéntica al teclado
                 property bool isApplied: index === sessionSelector.currentIndex
                 property bool isHighlighted: index === sessionPopup.highlightedIndex
-                property bool isHovered: mouseArea.containsMouse
+                property bool isHovered: mouseArea.containsMouse || sessionPopup.visible && index === sessionPopup.highlightedIndex
 
                 Behavior on color { ColorAnimation { duration: 150 } }
                 color: {
-                    if (isHighlighted && isHovered) return "#4Dffffff" 
-                    if (isHighlighted) return "#33ffffff"              
-                    if (isHovered) return "#1Affffff"               
-                    return "transparent"                              
+                    if (isHighlighted && isHovered) return "#4Dffffff"
+                    if (isHighlighted) return "#33ffffff"
+                    if (isHovered) return "#1Affffff"
+                    return "transparent"
                 }
 
                 Row {
