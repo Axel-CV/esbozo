@@ -59,6 +59,8 @@ FocusScope {
                     
                     // Habilitar el enfoque del campo de entrada
                     focus: true 
+                    KeyNavigation.tab: submitButton
+                    KeyNavigation.right: submitButton
 
                     // Texto "Placeholder"
                     Text {
@@ -72,8 +74,8 @@ FocusScope {
                     }
 
                     // Eventos de teclado: Cuando presionas Enter
-                    Keys.onReturnPressed: passwordComponent.loginRequested(passwordInput.text)
-                    Keys.onEnterPressed: passwordComponent.loginRequested(passwordInput.text)
+                    Keys.onReturnPressed: passwordComponent.requestLogin()
+                    Keys.onEnterPressed: passwordComponent.requestLogin()
                 }
             }
         }
@@ -83,8 +85,17 @@ FocusScope {
             id: submitButton
             width: 48
             height: passwordComponent.height
+            focus: false
             color: config.SurfaceLight
             radius: config.RadiusLarge
+
+            property bool pressed: false
+            opacity: pressed ? 0.7 : 1.0
+            border.width: activeFocus || submitMouseArea.containsMouse ? 2 : 0
+            border.color: config.FocusBorder
+
+            KeyNavigation.backtab: passwordInput
+            KeyNavigation.left: passwordInput
 
             Image {
                 anchors.centerIn: parent
@@ -95,20 +106,49 @@ FocusScope {
             }
 
             MouseArea {
+                id: submitMouseArea
                 anchors.fill: parent
+                hoverEnabled: true
                 // Cambiar el cursor a una mano al pasar sobre el botón
                 cursorShape: Qt.PointingHandCursor
                 
                 // Al hacer clic, enviamos la misma señal que al presionar Enter
-                onClicked: passwordComponent.loginRequested(passwordInput.text)
+                onClicked: {
+                    submitButton.forceActiveFocus()
+                    passwordComponent.requestLogin()
+                }
                 
                 // Animación de opacidad al presionar y soltar el botón
-                onPressed: submitButton.opacity = 0.7
-                onReleased: submitButton.opacity = 1.0
+                onPressed: submitButton.pressed = true
+                onReleased: submitButton.pressed = false
+            }
+
+            Keys.onReturnPressed: passwordComponent.requestLogin()
+            Keys.onEnterPressed: passwordComponent.requestLogin()
+            Keys.onSpacePressed: passwordComponent.requestLogin()
+            Keys.onPressed: function(event) {
+                if (event.key === Qt.Key_Tab && passwordComponent.KeyNavigation.tab) {
+                    passwordComponent.KeyNavigation.tab.forceActiveFocus()
+                    event.accepted = true
+                } else if (event.key === Qt.Key_Backtab) {
+                    passwordInput.forceActiveFocus()
+                    event.accepted = true
+                } else if (event.key === Qt.Key_Space) {
+                    submitButton.pressed = true
+                }
+            }
+            Keys.onReleased: function(event) {
+                if (event.key === Qt.Key_Space)
+                    submitButton.pressed = false
             }
         }
     }
     
+    // Función para solicitar el inicio de sesión con la contraseña ingresada
+    function requestLogin() {
+        loginRequested(passwordInput.text)
+    }
+
     // Limpiar el campo de contraseña después de un intento de inicio de sesión fallido
     function clearPassword() {
         passwordInput.text = ""
