@@ -9,6 +9,7 @@ FocusScope {
     property string selectedUser: userModel.lastUser || ""
     property string selectedIcon: ""
     property int selectedIndex: 0
+    property var themeConfig: config
     // Cargar el usuario seleccionado
     function syncFromIndex(idx) {
         if (idx < 0 || idx >= userModel.count) return
@@ -67,9 +68,8 @@ FocusScope {
 
         delegate: Item {
             id: delegateavatarComponent
-            width: ListView.isCurrentItem ? 160 : 120
-            height: ListView.isCurrentItem ? 160 : 120
-
+            width: ListView.isCurrentItem ? themeConfig.FocusedAvatarSize : themeConfig.CompactAvatarSize
+            height: ListView.isCurrentItem ? themeConfig.FocusedAvatarSize : themeConfig.CompactAvatarSize
             Item {
                 id: visualWrapper
                 width: parent.width
@@ -92,7 +92,7 @@ FocusScope {
                 // Tu lógica de opacidad y escala intactas
                 opacity: avatarComponent.expanded || delegateavatarComponent.ListView.isCurrentItem ? 1.0 : 0.0
                 visible: opacity > 0
-                scale: delegateavatarComponent.ListView.isCurrentItem ? 1.0 : 0.85
+                scale: delegateavatarComponent.ListView.isCurrentItem ? (avatarComponent.activeFocus && !avatarComponent.expanded ? 1.08 : 1.0) : 0.85
 
                 Behavior on width { 
                     NumberAnimation { 
