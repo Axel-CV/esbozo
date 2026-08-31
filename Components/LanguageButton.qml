@@ -17,8 +17,8 @@ Item {
     Rectangle {
         id: hoverBackground
         anchors.fill: parent
-        radius: 8
-        color: "#E0E0E0"
+        radius: config.RadiusSmall
+        color: config.FocusBorder
         opacity: (mouseArea.containsMouse || languageButton.active || languageButton.activeFocus) ? 0.35 : 0.0
         scale: (mouseArea.containsMouse || languageButton.active || languageButton.activeFocus) ? 1.0 : 0.92
 
@@ -33,8 +33,9 @@ Item {
 
         Text {
             text: languageButton.label
-            color: "white"
-            font.pixelSize: 16
+            color: config.TextPrimary
+            font.family: config.FontFamily
+            font.pixelSize: config.FontSizeButton
             font.weight: Font.Medium
             anchors.verticalCenter: parent.verticalCenter
             opacity: mouseArea.pressed ? 0.5 : (mouseArea.containsMouse || languageButton.activeFocus ? 1.0 : 0.7)

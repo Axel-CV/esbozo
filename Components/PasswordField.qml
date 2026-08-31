@@ -19,12 +19,12 @@ FocusScope {
             id: inputBackground
             width: 320
             height: passwordComponent.height
-            color: "#E0E0E0"
-            radius: 16
+            color: config.SurfaceLight
+            radius: config.RadiusLarge
 
             // Indicador visual de enfoque
             border.width: passwordInput.activeFocus ? 2 : 0
-            border.color: "#3d7eff"
+            border.color: config.FocusBorder
 
             Row {
                 anchors.fill: parent
@@ -49,8 +49,9 @@ FocusScope {
                     // El ancho es todo el espacio sobrante menos el ícono y los márgenes
                     width: parent.width - lockIcon.width - parent.spacing
                     
-                    font.pixelSize: 16
-                    color: "#333333"
+                    font.family: config.FontFamily
+                    font.pixelSize: config.FontSizeButton
+                    color: config.TextDark
                     
                     // Ocultar el texto ingresado
                     echoMode: TextInput.Password 
@@ -62,8 +63,9 @@ FocusScope {
                     // Texto "Placeholder"
                     Text {
                         text: "Contraseña"
-                        color: "#888888"
-                        font.pixelSize: 16
+                        color: config.TextMuted
+                        font.family: config.FontFamily
+                        font.pixelSize: config.FontSizeButton
                         anchors.verticalCenter: parent.verticalCenter
                         // Mostar el placeholder solo cuando el campo está vacío
                         visible: passwordInput.text === "" 
@@ -81,8 +83,8 @@ FocusScope {
             id: submitButton
             width: 48
             height: passwordComponent.height
-            color: "#E0E0E0"
-            radius: 16
+            color: config.SurfaceLight
+            radius: config.RadiusLarge
 
             Image {
                 anchors.centerIn: parent

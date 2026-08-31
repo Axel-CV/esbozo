@@ -20,7 +20,7 @@ Item {
         anchors.centerIn: parent
         width: parent.width + 16
         height: parent.height + 16
-        color: "#E0E0E0"
+        color: config.FocusBorder
         radius: width / 2
         opacity: (mouseArea.containsMouse || iconButton.active || iconButton.activeFocus) ? 0.35 : 0.0
         scale: (mouseArea.containsMouse || iconButton.active || iconButton.activeFocus) ? 1.0 : 0.85

@@ -186,8 +186,9 @@ FocusScope {
         anchors.topMargin: 12
         anchors.horizontalCenter: parent.horizontalCenter
         text: avatarComponent.selectedUser
-        color: "white"
-        font.pixelSize: 24
+        color: config.TextPrimary
+        font.family: config.FontFamily
+        font.pixelSize: config.FontSizeUsername
         font.weight: Font.Medium
     }
 

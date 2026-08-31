@@ -23,25 +23,27 @@ Item {
     Column {
         spacing: 8
 
-        // TEXTO DE LA HORA
+        // Texto de la hora
         Text {
             id: timeText
             // Formatea la hora actual a "00:00" (formato de 24 horas)
             text: Qt.formatTime(clockContainer.currentDate, "hh:mm")
-            color: "white"
-            font.pixelSize: 80
+            color: config.TextPrimary
+            font.family: config.FontFamily
+            font.pixelSize: config.FontSizeClock
             font.weight: Font.Normal
             horizontalAlignment: Text.AlignHCenter
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
-        // TEXTO DE LA FECHA
+        // Texto de la fecha
         Text {
             id: dateText
             // Formatea la fecha al estilo: "lunes, 1 de enero, 2000"
             text: Qt.formatDateTime(clockContainer.currentDate, "dddd, d 'de' MMMM, yyyy")
-            color: "#E0E0E0"
-            font.pixelSize: 24
+            color: config.TextSecondary
+            font.family: config.FontFamily
+            font.pixelSize: config.FontSizeDate
             font.weight: Font.Normal
             horizontalAlignment: Text.AlignHCenter
             anchors.horizontalCenter: parent.horizontalCenter

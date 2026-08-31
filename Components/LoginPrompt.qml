@@ -30,8 +30,9 @@ Item {
         // EL TEXTO
         Text {
             text: "Presiona cualquier tecla"
-            color: "white"
-            font.pixelSize: 16
+            color: config.TextPrimary
+            font.family: config.FontFamily
+            font.pixelSize: config.FontSizeButton
             font.weight: Font.Normal
             anchors.horizontalCenter: parent.horizontalCenter
         }

@@ -34,9 +34,9 @@ Popup {
     }
 
     background: Rectangle {
-        color: "#D91E1E1E"
-        radius: 16
-        border.color: "#33ffffff"
+        color: config.PopupBackground
+        radius: config.RadiusLarge
+        border.color: config.PopupBorder
         border.width: 1
     }
 
@@ -53,7 +53,7 @@ Popup {
         delegate: Rectangle {
             width: parent.width
             height: 52
-            radius: 8
+            radius: config.RadiusSmall
 
             // Cambiar el color de fondo si el elemento está seleccionado o si el mouse está sobre él
             property bool isApplied: index === keyboard.currentLayout
@@ -75,14 +75,16 @@ Popup {
                 anchors.verticalCenter: parent.verticalCenter
                 Text { 
                     text: longName
-                    color: isHighlighted ? "#ffffff" : "#dddddd" 
-                    font.pixelSize: 15 
+                    color: isHighlighted ? config.TextPrimary : config.TextItem
+                    font.family: config.FontFamily
+                    font.pixelSize: config.FontSizeItem
                     font.weight: isHighlighted ? Font.DemiBold : Font.Normal
                 }
                 Text { 
                     text: qsTr("Teclado ") + longName + (isApplied ? qsTr(" - Activo") : "")
-                    color: isHighlighted ? "#bbbbbb" : "#888888" 
-                    font.pixelSize: 11 
+                    color: isHighlighted ? config.TextSubtle : config.TextMuted
+                    font.family: config.FontFamily
+                    font.pixelSize: config.FontSizeSmall
                 }
             }
 

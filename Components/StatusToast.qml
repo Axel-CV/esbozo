@@ -34,10 +34,10 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        radius: 12
-        color: statusToast.isError ? "#66B00000" : "#66000000"
+        radius: config.RadiusMedium
+        color: statusToast.isError ? config.ErrorBackground : config.InfoBackground
         border.width: 1
-        border.color: statusToast.isError ? "#88FF6B6B" : "#33FFFFFF"
+        border.color: statusToast.isError ? config.ErrorBorder : config.InfoBorder
     }
 
     Text {
@@ -46,8 +46,9 @@ Item {
         width: parent.width - 24
         horizontalAlignment: Text.AlignHCenter
         wrapMode: Text.WordWrap
-        color: statusToast.isError ? "#FF8A8A" : "#E8E8E8"
-        font.pixelSize: 14
+        color: statusToast.isError ? config.ErrorText : config.SuccessText
+        font.family: config.FontFamily
+        font.pixelSize: config.FontSizeBody
         font.weight: Font.Medium
         text: ""
     }

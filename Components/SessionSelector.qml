@@ -62,12 +62,12 @@ FocusScope {
     Rectangle {
         id: mainButton
         anchors.fill: parent
-        color: sessionSelector.activeFocus ? "#33ffffff" : "#1Affffff"
-        radius: 8
+        color: sessionSelector.activeFocus ? config.SurfaceOverlayStrong : config.SurfaceOverlay
+        radius: config.RadiusSmall
 
         // Inficador visual de enfoque 
         border.width: sessionSelector.activeFocus ? 1 : 0
-        border.color: "#33ffffff"
+        border.color: config.PopupBorder
         
         Behavior on color { ColorAnimation { duration: 150 } }
 
@@ -88,8 +88,9 @@ FocusScope {
             Text {
                 id: buttonText
                 text: "Cargando..."
-                color: "#ffffff"
-                font.pixelSize: 16
+                color: config.TextPrimary
+                font.family: config.FontFamily
+                font.pixelSize: config.FontSizeButton
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - 32
                 elide: Text.ElideRight
@@ -134,9 +135,9 @@ FocusScope {
         exit: Transition { NumberAnimation { property: "opacity"; from: 1.0; to: 0.0; duration: 100 } }
 
         background: Rectangle {
-            color: "#D91E1E1E"
-            radius: 16
-            border.color: "#33ffffff"
+            color: config.PopupBackground
+            radius: config.RadiusLarge
+            border.color: config.PopupBorder
             border.width: 1
         }
 
@@ -151,7 +152,7 @@ FocusScope {
             delegate: Rectangle {
                 width: parent.width
                 height: 52
-                radius: 8
+                radius: config.RadiusSmall
 
                 // Lógica de estados idéntica al teclado
                 property bool isApplied: index === sessionSelector.currentIndex
@@ -184,14 +185,16 @@ FocusScope {
                         anchors.verticalCenter: parent.verticalCenter
                         Text { 
                             text: model.name || ""
-                            color: isHighlighted ? "#ffffff" : "#dddddd" 
-                            font.pixelSize: 15 
+                            color: isHighlighted ? config.TextPrimary : config.TextItem
+                            font.family: config.FontFamily
+                            font.pixelSize: config.FontSizeItem
                             font.weight: isHighlighted ? Font.DemiBold : Font.Normal
                         }
                         Text { 
                             text: isApplied ? qsTr("Sesión activa") : qsTr("Entorno de escritorio")
-                            color: isHighlighted ? "#bbbbbb" : "#888888" 
-                            font.pixelSize: 11 
+                            color: isHighlighted ? config.TextSubtle : config.TextMuted
+                            font.family: config.FontFamily
+                            font.pixelSize: config.FontSizeSmall
                         }
                     }
                 }
