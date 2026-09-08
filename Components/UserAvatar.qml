@@ -148,16 +148,6 @@ FocusScope {
                     maskSource: mask
                 }
 
-                // Borde sutil cuando está seleccionado
-                Rectangle {
-                    anchors.fill: parent
-                    radius: width / 2
-                    color: "transparent"
-                    border.color: "transparent"
-                    border.width: 3
-                    opacity: 0.7
-                }
-
                 MouseArea {
                     anchors.fill: parent
                     // Desactiva el cursor de mano si solo hay 1 usuario en el sistema
