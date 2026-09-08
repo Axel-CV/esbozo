@@ -19,8 +19,10 @@ FocusScope {
             id: inputBackground
             width: 320
             height: passwordComponent.height
-            color: config.SurfaceLight
+            color: passwordInput.activeFocus ? config.SurfaceOverlayStrong : config.SurfaceOverlay
             radius: config.RadiusLarge
+
+            Behavior on color { ColorAnimation { duration: 150 } }
 
             // Indicador visual de enfoque
             border.width: passwordInput.activeFocus ? 2 : 0
@@ -51,7 +53,7 @@ FocusScope {
                     
                     font.family: config.FontFamily
                     font.pixelSize: config.FontSizeButton
-                    color: config.TextDark
+                    color: config.TextPrimary
                     
                     // Ocultar el texto ingresado
                     echoMode: TextInput.Password 
@@ -65,7 +67,7 @@ FocusScope {
                     // Texto "Placeholder"
                     Text {
                         text: "Contraseña"
-                        color: config.TextMuted
+                        color: config.TextPrimary
                         font.family: config.FontFamily
                         font.pixelSize: config.FontSizeButton
                         anchors.verticalCenter: parent.verticalCenter
@@ -86,8 +88,10 @@ FocusScope {
             width: 48
             height: passwordComponent.height
             focus: false
-            color: config.SurfaceLight
+            color: (activeFocus || submitMouseArea.containsMouse) ? config.SurfaceOverlayStrong : config.SurfaceOverlay
             radius: config.RadiusLarge
+
+            Behavior on color { ColorAnimation { duration: 150 } }
 
             property bool pressed: false
             opacity: pressed ? 0.7 : 1.0
