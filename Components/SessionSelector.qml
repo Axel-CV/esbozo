@@ -66,10 +66,12 @@ FocusScope {
         radius: config.RadiusSmall
 
         // Inficador visual de enfoque 
-        border.width: sessionSelector.activeFocus || mainButtonMouseArea.containsMouse ? 1 : 0
-        border.color: config.PopupBorder
+        border.width: sessionSelector.activeFocus || sessionPopup.visible || mainButtonMouseArea.containsMouse ? 1 : 0
+        border.color: sessionSelector.activeFocus || sessionPopup.visible || mainButtonMouseArea.containsMouse
+                  ? config.FocusBorder : config.PopupBorder
         
         Behavior on color { ColorAnimation { duration: 150 } }
+        Behavior on border.color { ColorAnimation { duration: 150 } }
 
         Row {
             anchors.fill: parent
