@@ -70,6 +70,7 @@ FocusScope {
             id: delegateavatarComponent
             width: ListView.isCurrentItem ? themeConfig.FocusedAvatarSize : themeConfig.CompactAvatarSize
             height: ListView.isCurrentItem ? themeConfig.FocusedAvatarSize : themeConfig.CompactAvatarSize
+
             Item {
                 id: visualWrapper
                 width: parent.width
@@ -142,21 +143,17 @@ FocusScope {
                     asynchronous: true
                 }
 
-                HueSaturation {
-                    id: enhancedAvatar
-                    anchors.fill: avatarImage
+                OpacityMask {
+                    id: maskedAvatar
+                    anchors.fill: parent
                     source: avatarImage
-                    
-                    saturation: 0.35
-                    lightness: avatarMouseArea.containsMouse || avatarComponent.activeFocus ? 0.50 : 0.35
-                    
-                    visible: false
+                    maskSource: mask
                 }
 
-                OpacityMask {
-                    anchors.fill: parent
-                    source: enhancedAvatar
-                    maskSource: mask
+                ColorOverlay {
+                    anchors.fill: maskedAvatar
+                    source: maskedAvatar
+                    color: config.AccentColor
                 }
 
                 MouseArea {
