@@ -92,7 +92,7 @@ FocusScope {
                 // Tu lógica de opacidad y escala intactas
                 opacity: avatarComponent.expanded || delegateavatarComponent.ListView.isCurrentItem ? 1.0 : 0.0
                 visible: opacity > 0
-                scale: delegateavatarComponent.ListView.isCurrentItem ? (avatarComponent.activeFocus && !avatarComponent.expanded ? 1.08 : 1.0) : 0.85
+                scale: delegateavatarComponent.ListView.isCurrentItem ? ((avatarComponent.activeFocus || avatarMouseArea.containsMouse) && !avatarComponent.expanded ? 1.08 : 1.0) : 0.85
 
                 Behavior on width { 
                     NumberAnimation { 
@@ -142,14 +142,28 @@ FocusScope {
                     asynchronous: true
                 }
 
+                HueSaturation {
+                    id: enhancedAvatar
+                    anchors.fill: avatarImage
+                    source: avatarImage
+                    
+                    saturation: 0.35
+                    lightness: avatarMouseArea.containsMouse || avatarComponent.activeFocus ? 0.50 : 0.35
+                    
+                    visible: false
+                }
+
                 OpacityMask {
                     anchors.fill: parent
-                    source: avatarImage
+                    source: enhancedAvatar
                     maskSource: mask
                 }
 
                 MouseArea {
+                    id: avatarMouseArea
                     anchors.fill: parent
+                    hoverEnabled: true
+
                     // Desactiva el cursor de mano si solo hay 1 usuario en el sistema
                     cursorShape: userModel.count > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
                     onClicked: {
