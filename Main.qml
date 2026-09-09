@@ -162,7 +162,7 @@ Item {
             // Mostrar un mensaje cuando se active el bloqueo de mayúsculas
             function onCapsLockChanged() {
                 if (keyboard.capsLock && root.showLoginScreen) {
-                    statusToast.show("Bloqueo de mayúsculas activado", false)
+                    statusToast.show("Bloqueo de mayúsculas activado", false, true)
                 } else if (!keyboard.capsLock && root.showLoginScreen) {
                     // Desactivar el mensaje cuando se desactive el bloqueo de mayúsculas
                     statusToast.clear()
@@ -288,8 +288,11 @@ Item {
     onShowLoginScreenChanged: {
         if (showLoginScreen) {
             passwordField.forceActiveFocus()
+            if (keyboard && keyboard.capsLock)
+                statusToast.show("Bloqueo de mayúsculas activado", false, true)
         } else {
             initialScreen.forceActiveFocus()
+            statusToast.clear()
         }
     }
 }

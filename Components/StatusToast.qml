@@ -4,6 +4,7 @@ Item {
     id: statusToast
 
     property bool isError: false
+    property bool persistent: false
     property int duration: 3500
 
     width: Math.min(parent ? parent.width * 0.8 : 400, messageText.implicitWidth + 40)
@@ -14,15 +15,20 @@ Item {
 
     Behavior on opacity { NumberAnimation { duration: 180 } }
 
-    function show(msg, error) {
+    function show(msg, error, keepVisible) {
         messageText.text = msg || ""
         statusToast.isError = !!error
+        statusToast.persistent = !!keepVisible
         statusToast.opacity = 1
-        hideTimer.restart()
+        if (statusToast.persistent)
+            hideTimer.stop()
+        else
+            hideTimer.restart()
     }
 
     function clear() {
         statusToast.opacity = 0
+        statusToast.persistent = false
         hideTimer.stop()
     }
 
