@@ -40,7 +40,10 @@ Item {
         Text {
             id: dateText
             // Formatea la fecha al estilo: "lunes, 1 de enero, 2000"
-            text: Qt.formatDateTime(clockContainer.currentDate, "dddd, d 'de' MMMM, yyyy")
+            text: clockContainer.currentDate.toLocaleDateString(
+                Qt.locale("es_MX"),
+                "dddd, d 'de' MMMM, yyyy"
+            )
             color: config.TextSecondary
             font.family: config.FontFamily
             font.pixelSize: config.FontSizeDate
