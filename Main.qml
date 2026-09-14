@@ -123,7 +123,7 @@ Item {
                 KeyNavigation.down: sleepButton
 
                 onLoginRequested: (password) => {
-                    sddm.login(userSwitcher.selectedUser, password, sessionSelector.sessionIndex)
+                    sddm.login(userSwitcher.selectedUser, password, sessionSelector.currentIndex)
                 }
             }
 
